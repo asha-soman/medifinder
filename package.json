@@ -10,7 +10,8 @@
     "test:backend": "npm test --prefix backend"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.1.10"
   },
   "author": "Medifinder Team",
   "license": "ISC"
