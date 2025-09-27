@@ -9,10 +9,17 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+// app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
-app.use('/api/test', require('./routes/test.routes'));
 
+app.use('/api/auth', require('./routes/auth.routes'));
+app.use('/api/patient', require('./routes/patient.routes'));
+app.use('/api/doctor',  require('./routes/doctor.routes'));
+
+
+
+app.use('/api/test', require('./routes/test.routes'));
 
 
 if (require.main === module) {
