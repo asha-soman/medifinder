@@ -1,0 +1,37 @@
+.mf-footer{
+  background:#163a5b; color:#e9eef6; border-top:1px solid rgba(255,255,255,.08);
+}
+.mf-footer__inner{
+  max-width:1120px; margin:0 auto; padding:24px 20px;
+  display:grid; gap:18px;
+  grid-template-columns: 1.2fr 1fr 1fr 1.2fr 1fr;
+}
+.mf-brand{display:flex; align-items:center; gap:8px; font-size:20px}
+.mf-brand__icon{
+  width:24px;height:24px;border-radius:50%;display:grid;place-items:center;
+  background:#0e2b45;border:1px solid rgba(255,255,255,.18);font-weight:700
+}
+.mf-brand__text b{color:#7cc04b}
+.mf-copy{margin:8px 0 0; font-size:13px; opacity:.9}
+
+.mf-col h4{margin:0 0 8px; font-size:14px; font-weight:700; opacity:.95}
+.mf-col ul{margin:0; padding:0; list-style:none; display:grid; gap:6px}
+.mf-col a{color:#dbe7f5; text-decoration:none}
+.mf-col a:hover{ text-decoration:underline }
+
+.mf-contact li, .mf-social li{font-size:14px}
+
+/* Simple icon placeholders using common glyphs (works without icon libs) */
+.mf-social a{display:inline-block}
+
+/* responsive */
+@media (max-width: 920px){
+  .mf-footer__inner{
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 520px){
+  .mf-footer__inner{
+    grid-template-columns: 1fr;
+  }
+}

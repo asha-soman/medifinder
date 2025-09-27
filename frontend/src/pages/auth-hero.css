@@ -1,0 +1,87 @@
+.mf-hero{
+  background: center/cover no-repeat url("../assets/hero.jpg");
+  min-height: calc(100vh - 56px);
+  display:grid; 
+  place-items:center;
+}
+
+.mf-hero__overlay{
+  width:100%;
+   max-width:980px; 
+  margin:0 auto; 
+  padding:40px 16px;
+  display:grid; 
+  place-items:center;
+}
+
+.mf-card{
+  width:min(540px, 100%);
+  background: rgba(13, 31, 54, .82);       
+  border: 1px solid rgba(255,255,255,.08);
+  backdrop-filter: blur(4px);
+  border-radius: 14px;
+  padding: 28px;
+  display:grid; 
+  gap:14px;
+}
+
+.mf-card__title{
+  margin: 4px 0 8px 0;
+  text-align:center;
+  color:#7cc04b; 
+  font-size:28px; 
+  font-weight:800;
+}
+
+.mf-input{
+  width:100%; padding:12px 14px; 
+  border-radius:10px;
+  border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.92); 
+  color:#0a1b2c;
+  outline:none; 
+  font-size:15px;
+}
+.mf-input:focus{ 
+  box-shadow: 0 0 0 3px rgba(124,192,75,.25) 
+}
+
+.mf-cta{
+  margin-top:6px;
+  width:100%; 
+  padding:12px 14px;
+  border:0; 
+  border-radius:10px;
+  background:#7cc04b; 
+  color:#0a1b2c; 
+  font-weight:800; 
+  font-size:16px;
+  cursor:pointer; 
+  box-shadow: 0 12px 24px rgba(124,192,75,.25);
+}
+.mf-cta:hover{ 
+  filter:brightness(1.03) 
+}
+
+.mf-help{
+  margin:4px 0 0; 
+  text-align:center; 
+  color:#d7e2ee; 
+  font-size:13px;
+}
+.mf-help a{ 
+  color:#a8e06f; 
+  text-decoration:none 
+}
+.mf-help a:hover{ 
+  text-decoration:underline 
+}
+
+.mf-error{
+  background: rgba(239,71,111,.12);
+  color:#ffd8e1; 
+  border:1px solid rgba(239,71,111,.35);
+  padding:10px 12px; 
+  border-radius:10px; 
+  font-size:13px;
+}
