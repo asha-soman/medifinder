@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
-import SiteHeader from "../components/SiteHeader";
 import "./auth-hero.css"; 
 
 export default function Login() {
