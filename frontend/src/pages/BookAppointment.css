@@ -1,0 +1,120 @@
+.book-page {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 24px 40px;
+  box-sizing: border-box;
+  font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color: #1B3951;
+}
+
+.page-title {
+  margin: 60px 0 18px;
+  font-weight: 700;
+  font-size: 25px;
+  line-height: 1.25;
+}
+
+.section { margin-bottom: 28px; }
+
+.section-title {
+  font-weight: 700;
+  font-size: 20px;
+  margin: 8px 0 10px;
+}
+
+/* Summary card */
+.summary-card {
+  background: #F3F4F6;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #E5E7EB;
+}
+.summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.summary-row:last-child { margin-bottom: 0; }
+
+.label-strong { font-weight: 700; }
+.text, .label-strong { font-size: 20px; font-weight: 400; }
+
+.summary-row--meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+  gap: 10px;
+}
+.meta-cell { font-size: 20px; }
+.meta-center { text-align: center; }
+.meta-right { text-align: left; padding-left: 12px; }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 24px;
+}
+.form-span-2 { grid-column: 1 / -1; }
+.form-field { display: flex; flex-direction: column; }
+
+.label {
+  font-weight: 400;
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+
+.input {
+  height: 44px;
+  border-radius: 8px;
+  border: 1px solid #D1D5DB;
+  background: #FFFFFF;
+  padding: 0 12px;
+  font-size: 16px;
+  color: #1B3951;
+  font-family: inherit;
+}
+
+.textarea {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #D1D5DB;
+  background: #FFFFFF;
+  padding: 10px 12px;
+  font-size: 16px;
+  color: #1B3951;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.error-block {
+  margin: 10px 0 0;
+  color: #B91C1C;
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  margin-top: 24px;
+}
+.btn {
+  width: 100px;
+  height: 60px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-size: 20px;
+  font-weight: 400;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn-primary { background: #6EAB36; color: #fff; border-color: #6EAB36; }
+.btn-primary:disabled { opacity: .7; cursor: not-allowed; }
+.btn-cancel { background: #893536; color: #FFFFFF; border-color: #893536; }
+
+@media (max-width: 780px) {
+  .form-grid { grid-template-columns: 1fr; }
+}
