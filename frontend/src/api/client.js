@@ -1,5 +1,14 @@
-// CRA reads env vars that start with REACT_APP_*
-const BASE = process.env.REACT_APP_API_BASE_URL || "/api";
+function computeBase() {
+  const { hostname, port } = window.location;
+
+  if (hostname === "localhost" || port === "3000") {
+    return "http://localhost:5001/api";
+  }
+
+  return `http://${hostname}:5001/api`;
+}
+
+const BASE = computeBase();
 
 export async function apiFetch(path, { method = "GET", body, token } = {}) {
   const headers = { "Content-Type": "application/json" };
@@ -11,11 +20,17 @@ export async function apiFetch(path, { method = "GET", body, token } = {}) {
     body: body ? JSON.stringify(body) : undefined,
   });
 
-  // Attempt to parse JSON; if not JSON, fallback to empty object
-  const data = await res.json().catch(() => ({}));
+  const ct = res.headers.get("content-type") || "";
+  const isJson = ct.includes("application/json");
+  const data = isJson ? await res.json() : null;
+
   if (!res.ok) {
-    const msg = data?.error || `HTTP ${res.status}`;
+    const msg = (data && data.error) || `HTTP ${res.status}`;
     throw new Error(msg);
   }
+  if (!isJson) {
+    throw new Error("Unexpected response from server");
+  }
+
   return data;
 }
