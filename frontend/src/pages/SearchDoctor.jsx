@@ -114,7 +114,7 @@ export default function SearchDoctor() {
     (async () => {
       try {
         const start = todayLocal();
-        const found = await findNextAvailableDate({ name, specialty, startDate: start });
+        const found = await findNextAvailableDate({ name: "", specialty: "", startDate: start });
         if (found) {
           setAutoSelectedDate(found.dateStr);
           const normalized = normalizeDoctorsResponse(found.data);
