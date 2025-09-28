@@ -73,7 +73,6 @@ export default function SearchDoctor() {
   // paging
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
-  const [total, setTotal] = useState(0);
 
   // UI hint for auto-selected date
   const [autoSelectedDate, setAutoSelectedDate] = useState("");
@@ -122,14 +121,12 @@ export default function SearchDoctor() {
           setResults(filterBySlotsIfDated(normalized, true));
           setPage(Number(found.data?.page || 1));
           setPages(Number(found.data?.pages || 1));
-          setTotal(Number(found.data?.total || 0));
         } else {
           const data = await searchDoctors({ page: 1, limit: 5 });
           const normalized = normalizeDoctorsResponse(data);
           setResults(filterBySlotsIfDated(normalized, false));
           setPage(Number(data?.page || 1));
           setPages(Number(data?.pages || 1));
-          setTotal(Number(data?.total || (Array.isArray(data) ? data.length : 0)));
         }
       } catch {}
     })();
@@ -151,7 +148,6 @@ export default function SearchDoctor() {
       setResults(filterBySlotsIfDated(normalized, hasDateInEffect));
       setPage(Number(data?.page || targetPage));
       setPages(Number(data?.pages || 1));
-      setTotal(Number(data?.total || 0));
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
       setError("Search failed. Please try again.");
@@ -182,7 +178,6 @@ export default function SearchDoctor() {
         setResults(filterBySlotsIfDated(normalized, hasDateInEffect));
         setPage(Number(data?.page || 1));
         setPages(Number(data?.pages || 1));
-        setTotal(Number(data?.total || 0));
         setAutoSelectedDate("");
       } else {
         const found = await findNextAvailableDate({ name, specialty, startDate: effectiveDate });
@@ -192,12 +187,10 @@ export default function SearchDoctor() {
           setResults(filterBySlotsIfDated(normalizedFound, true));
           setPage(Number(found.data?.page || 1));
           setPages(Number(found.data?.pages || 1));
-          setTotal(Number(found.data?.total || 0));
         } else {
           setResults([]);
           setPages(1);
           setPage(1);
-          setTotal(0);
           setError("No availability found in the next 14 days.");
         }
       }
