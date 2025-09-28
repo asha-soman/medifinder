@@ -1,24 +1,86 @@
 .mf-header{
-  position:sticky; top:0; z-index:10;
-  background:#163a5b; /* deep navy */
-  border-bottom:1px solid rgba(255,255,255,.08);
+  background:#173e59;
+  position:sticky;
+  top:0;z-index:50
 }
-.mf-header__inner{
-  height:56px; max-width:1120px; margin:0 auto; padding:0 20px;
-  display:flex; align-items:center; justify-content:space-between;
-}
-.mf-brand{display:flex; align-items:center; gap:8px; color:#e9eef6; text-decoration:none; font-size:20px}
-.mf-brand__icon{
-  width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
-  background: #0e2b45; border:1px solid rgba(255,255,255,.18); font-weight:700
-}
-.mf-brand__text b{color:#7cc04b;} /* green accent */
 
-.mf-nav{display:flex; gap:10px}
-.mf-btn{
-  padding:8px 14px; border-radius:8px; text-decoration:none; font-weight:600;
-  transition:filter .15s ease; border:1px solid transparent;
+.mf-header__inner{
+  width:100%;margin:0;
+  padding:10px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between
 }
-.mf-btn--ghost{ color:#e9eef6; border-color:rgba(255,255,255,.15) }
-.mf-btn--primary{ background:#7cc04b; color:#0a1b2c }
-.mf-btn:hover{ filter:brightness(1.05) }
+
+.mf-header__inner--gutter{
+  padding-left:clamp(20px,5vw,48px);
+  padding-right: clamp(64px, 8vw, 120px); 
+}
+
+.mf-brand{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;color:#fff;
+  text-decoration:none
+}
+
+.mf-brand__text{
+  font-weight:400;
+  letter-spacing:.2px;
+  font-size: 30px;
+}
+
+.mf-brand__medi{
+  color:#45c264
+}
+
+.mf-brand__badge{
+  width:28px;
+  height:28px;
+  display:grid;
+  place-items:center;
+  border-radius:999px;
+  box-shadow:0 2px 6px rgba(0,0,0,.25), inset 0 1px 1px rgba(255,255,255,.25);
+}
+
+.mf-nav{
+  display:inline-flex;
+  gap:8px;
+  margin-left:auto;            
+  padding-right: clamp(28px, 5vw, 96px);
+}
+
+.mf-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height:34px;
+  padding:0 14px;
+  border-radius:8px;
+  font-weight:500;
+  text-decoration:none
+}
+
+.mf-btn--ghost{
+  color:#e8f3fb;
+  border:1px solid rgba(255,255,255,.35)
+}
+
+.mf-btn--ghost:hover{
+  background:rgba(255,255,255,.08)
+}
+
+.mf-btn--primary{
+  background:#3aa655;
+  color:#fff
+}
+
+.mf-btn--primary:hover{
+  filter:brightness(.95)
+}
+
+@media (min-width: 1200px) {
+  .mf-header__inner--gutter {
+    padding-right: 144px;
+  }
+}

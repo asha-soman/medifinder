@@ -8,24 +8,25 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import PatientDashboard from "./pages/PatientDashboard";
 import DoctorDashboard from "./pages/DoctorDashboard";
+import Landing from "./pages/Landing";
+
 
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Everything under AppLayout gets the footer */}
           <Route element={<AppLayout />}>
+            <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
 
-            <Route
-              path="/patient/dashboard"
-              element={
-                <RequireAuth role="patient">
-                  <PatientDashboard />
-                </RequireAuth>
-              }
+            <Route path="/patient/dashboard" 
+            element={
+              <RequireAuth role="patient">
+                <PatientDashboard />
+              </RequireAuth>
+            }
             />
             <Route
               path="/doctor/dashboard"
