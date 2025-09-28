@@ -2,14 +2,18 @@ import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import "./auth-hero.css";
+import { useLocation } from "react-router-dom";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const loc = useLocation();
+  const [email, setEmail] = useState(loc.state?.email || ""); 
   const [password, setPassword] = useState("");
   const [showPwd, setShowPwd] = useState(false);
   const [err, setErr] = useState("");
   const { login } = useAuth();
   const nav = useNavigate();
+  
+
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -39,7 +43,7 @@ export default function Login() {
               id="login-email"
               className="mf-input"
               type="email"
-              placeholder="you@example.com"
+              placeholder="Email Id"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -52,7 +56,7 @@ export default function Login() {
                 id="login-password"
                 className="form-control"
                 type={showPwd ? "text" : "password"}
-                placeholder="••••••••"
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required

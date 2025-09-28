@@ -79,6 +79,7 @@
   filter:brightness(.95)
 }
 
+
 @media (min-width: 1200px) {
   .mf-header__inner--gutter {
     padding-right: 144px;

@@ -13,13 +13,18 @@ export default function Signup() {
   const { register } = useAuth();
   const nav = useNavigate();
 
-  async function onSubmit(e) {
-    e.preventDefault(); setErr("");
-    try {
-      const u = await register(name, email, role, password);
-      nav(u.role === "doctor" ? "/doctor/dashboard" : "/patient/dashboard", { replace: true });
-    } catch (e) { setErr(e.message || "Signup failed"); }
+
+async function onSubmit(e){
+  e.preventDefault(); 
+  setErr("");
+  try{
+    await register(name, email, role, password);   
+    nav("/login", { replace: true, state: { email } });
+  }catch(e){ 
+    setErr(e.message || "Signup failed"); 
   }
+}
+
 
   return (
     <>
