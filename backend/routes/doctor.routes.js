@@ -1,17 +1,32 @@
-const express = require("express");
+const router = require("express").Router();
 const { authenticate, requireRole } = require("../middleware/auth.middleware");
-const { getDoctorDashboard } = require("../shared/facades/dashboard.facade");
+const { DoctorProfileService } = require("../services/doctorProfile.service");
 
-const router = express.Router();
-
-// Doctor dashboard (Facade + Proxy/Guard)
-router.get("/dashboard", authenticate, requireRole("doctor"), async (req, res) => {
-  try {
-    const data = await getDoctorDashboard(req.user.sub);
-    res.json(data);
-  } catch {
-    res.status(500).json({ error: "Failed to load doctor dashboard" });
+router.get(
+  "/profile",
+  authenticate, requireRole("doctor"),
+  async (req, res, next) => {
+    try {
+      const profile = await DoctorProfileService.getByUserId(req.user.sub);
+      res.json(profile);
+    } catch (e) { next(e); }
   }
-});
+);
+
+router.put(
+  "/profile",
+  authenticate, requireRole("doctor"),
+  async (req, res, next) => {
+    try {
+      const patch = {
+        specialization: req.body?.specialization,
+        clinicName:     req.body?.clinicName,
+        contact:        req.body?.contact,
+      };
+      const updated = await DoctorProfileService.update(req.user.sub, patch);
+      res.json(updated); 
+    } catch (e) { next(e); }
+  }
+);
 
 module.exports = router;
