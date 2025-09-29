@@ -1,0 +1,51 @@
+/* Full-bleed hero like your landing/signup */
+.doctor-dashboard .docdash-hero {
+  min-height: 70vh;                   /* plenty of space for headline + cards */
+  background: url("../assets/hero.jpg") center center / cover no-repeat;
+  position: relative;
+}
+
+/* dark glass overlay behind the heading */
+.doctor-dashboard .docdash-hero-overlay {
+  background: rgba(10, 31, 48, 0.65); /* deep blue translucent */
+  backdrop-filter: blur(2px);
+  max-width: 780px;
+}
+
+/* floating actions card */
+.doctor-dashboard .docdash-actions {
+  max-width: 1000px;
+  margin: 1.25rem auto 0 auto;
+}
+
+/* clickable cards */
+.doctor-dashboard .docdash-link {
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid rgba(0,0,0,.05);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.doctor-dashboard .docdash-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.75rem 1.2rem rgba(0,0,0,.08);
+}
+
+/* stat strip */
+.doctor-dashboard .stat-card .stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #163d5d; /* your header blue */
+}
+.doctor-dashboard .stat-card .stat-label {
+  font-size: .95rem;
+}
+
+/* tighten spacing on smaller screens */
+@media (max-width: 576px) {
+  .doctor-dashboard .docdash-hero {
+    min-height: 62vh;
+  }
+  .doctor-dashboard .docdash-hero-overlay {
+    padding: 1rem !important;
+  }
+}

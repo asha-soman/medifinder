@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import "./site-header.css";
 
 export default function SiteHeader() {
-  const { logout, isAuthed, user } = useAuth();
+  const { logout, isAuthed } = useAuth();
   const nav = useNavigate();
 
   const handleLogout = () => {
@@ -26,9 +26,14 @@ export default function SiteHeader() {
         <nav className="mf-nav">
           {authed ? (
             <>
-              <button type="button" onClick={handleLogout} className="btn btn-sm btn-outline-light">
-                Logout
-              </button>
+             <button
+  type="button"
+  onClick={handleLogout}
+  className="btn btn-sm btn-success"  // green Bootstrap button
+>
+  Logout
+</button>
+
 
             </>
           ) : (

@@ -9,6 +9,8 @@ import Signup from "./pages/Signup";
 import PatientDashboard from "./pages/PatientDashboard";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import Landing from "./pages/Landing";
+import DoctorProfile from "./pages/DoctorProfile";
+import PatientProfile from "./pages/PatientProfile";
 
 
 export default function App() {
@@ -21,12 +23,12 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
 
-            <Route path="/patient/dashboard" 
-            element={
-              <RequireAuth role="patient">
-                <PatientDashboard />
-              </RequireAuth>
-            }
+            <Route path="/patient/dashboard"
+              element={
+                <RequireAuth role="patient">
+                  <PatientDashboard />
+                </RequireAuth>
+              }
             />
             <Route
               path="/doctor/dashboard"
@@ -36,6 +38,23 @@ export default function App() {
                 </RequireAuth>
               }
             />
+            <Route
+              path="/doctor/profile"
+              element={
+                <RequireAuth role="doctor">
+                  <DoctorProfile />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/patient/profile"
+              element={
+                <RequireAuth role="patient">
+                  <PatientProfile />
+                </RequireAuth>
+              }
+            />
+
 
             <Route path="*" element={<Login />} />
           </Route>
