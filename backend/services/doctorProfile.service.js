@@ -11,10 +11,8 @@ class DoctorProfileService {
   }
 
   async _updateRaw(userId, patch) {
-    // Only allow the three fields
     const allowed = {};
     if (typeof patch?.specialization === "string") allowed.specialization = patch.specialization.trim();
-    if (typeof patch?.clinicName === "string")     allowed.clinicName     = patch.clinicName.trim();
     if (typeof patch?.contact === "string")        allowed.contact        = patch.contact.trim();
 
     const before = (await DoctorProfile.findOne({ userId }))?.toObject() || {};

@@ -35,7 +35,6 @@ router.put(
     try {
       const patch = {
         specialization: req.body?.specialization,
-        clinicName:     req.body?.clinicName,
         contact:        req.body?.contact,
       };
       const updated = await DoctorProfileService.update(req.user.sub, patch);
