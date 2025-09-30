@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import PatientDashboard from "./pages/PatientDashboard";
 import DoctorDashboard from "./pages/DoctorDashboard";
+import DoctorCalendar from "./pages/DoctorCalendar";
 
 // patient booking pages
 import SearchDoctor from "./pages/SearchDoctor";
@@ -61,6 +62,12 @@ export default function App() {
             <Route path="/patient/search" element={<SearchDoctor />} />
             <Route path="/patient/book" element={<BookAppointment />} />
             <Route path="/patient/my-appointments" element={<MyAppointments />} />
+            <Route
+              path="/doctor/calendar"
+              element={
+                <DoctorCalendar />
+              }
+            />
           </Route>
         </Routes>
       </BrowserRouter>
