@@ -1,9 +1,10 @@
 // backend/services/slots.service.js
-const Availability = require('../models/availability.model');
-const Appointment  = require('../models/appointment.model');
-const Doctor       = require('../models/doctor.model');
+const Availability  = require('../models/availability.model');
+const Appointment   = require('../models/appointment.model');
+const User          = require('../models/user.model');
+const DoctorProfile = require('../models/doctorProfile.model');
 
-/* slice availability into 60 minutes interval*/
+// slice availability into 60 minutes interval
 function sliceHourly(start, end) {
   const out = [];
   const s = new Date(start);
@@ -21,9 +22,71 @@ function sliceHourly(start, end) {
   return out;
 }
 
-async function findSlots({ date, specialty, name, page = 1, limit = 5 }) {
+async function loadDoctorsAndCount(doctorFilters, sort, skip, limit, forNoDatePage) {
+  const userQuery = { role: 'DOCTOR' };
+  if (doctorFilters.$or) {
+    const rx = doctorFilters.$or.find(x => x.doctorName)?.doctorName
+            || doctorFilters.$or.find(x => x.email)?.email;
+    if (rx) userQuery.$or = [{ name: rx }, { email: rx }];
+  }
+
+  const users = await User.find(userQuery)
+    .select('_id name email')
+    .lean();
+
+  if (users.length === 0) {
+    return { total: 0, doctors: [] };
+  }
+
+  const userIds = users.map(u => u._id);
+  let profiles = await DoctorProfile.find({ userId: { $in: userIds } })
+    .select('userId specialization clinicName contact')
+    .lean();
+
+  // specialization filter
+  if (doctorFilters.specialization && doctorFilters.specialization !== 'All') {
+    const rx = new RegExp(`^${doctorFilters.specialization}$`, 'i');
+    profiles = profiles.filter(p => rx.test(p.specialization || ''));
+  }
+
+  // Join user + profile
+  const userById = new Map(users.map(u => [String(u._id), u]));
+  let joined = profiles.map(p => {
+    const u = userById.get(String(p.userId));
+    if (!u) return null;
+    return {
+      _id: u._id,
+      doctorName: u.name || 'Doctor',
+      specialization: p.specialization || '',
+      email: u.email || '',
+      phone: p.contact || ''
+    };
+  }).filter(Boolean);
+
+  // Sort by doctorName
+  if (sort && sort.doctorName) {
+    const dir = sort.doctorName;
+    joined.sort((a, b) => {
+      const an = (a.doctorName || '').toLowerCase();
+      const bn = (b.doctorName || '').toLowerCase();
+      return dir > 0 ? an.localeCompare(bn) : bn.localeCompare(an);
+    });
+  }
+
+  // For the "no date" branch, paginate here.
+  // For the "with date" branch paginate after filtering
+  if (forNoDatePage) {
+    const total = joined.length;
+    const paged = joined.slice(skip, skip + limit);
+    return { total, doctors: paged, all: joined };
+  }
+
+  return { total: joined.length, doctors: joined, all: joined };
+}
+
+async function findSlots({ date, specialization, name, page = 1, limit = 5 }) {
   const doctorFilters = {};
-  if (specialty && specialty !== 'All') doctorFilters.specialty = specialty;
+  if (specialization && specialization !== 'All') doctorFilters.specialization = specialization;
   if (name) {
     const rx = new RegExp(name.trim(), 'i');
     doctorFilters.$or = [{ doctorName: rx }, { email: rx }];
@@ -34,54 +97,41 @@ async function findSlots({ date, specialty, name, page = 1, limit = 5 }) {
   const _limit = Number(limit) || 5;
   const skip   = (_page - 1) * _limit;
 
-  // No date filter, this will paginate doctors as-is
+  // No date filter: paginate doctors as-is
   if (!date) {
-    const [totalDoctors, doctors] = await Promise.all([
-      Doctor.countDocuments(doctorFilters),
-      Doctor.find(doctorFilters)
-        .sort(sort)
-        .skip(skip)
-        .limit(_limit)
-        .select('doctorName specialty email phone')
-        .lean(),
-    ]);
+    const { total, doctors } = await loadDoctorsAndCount(doctorFilters, sort, skip, _limit, true);
 
     const items = doctors.map(d => ({
       doctorId:   d._id,
       doctorName: d.doctorName,
-      specialty:  d.specialty,
+      specialization: d.specialization,
       email:      d.email,
       phone:      d.phone,
-      availableSlots: [], // will not computing slots without a date
+      availableSlots: [],
     }));
 
     return {
       page: _page,
       limit: _limit,
-      total: totalDoctors,
-      pages: Math.max(1, Math.ceil(totalDoctors / _limit)),
+      total,
+      pages: Math.max(1, Math.ceil(total / _limit)),
       items,
     };
   }
 
-  // Has Date filter present -> filter by "with slots" before paginate
-  // Again, bound in local time
+  // Has Date filter present, filter by "with slots" before paginate
   const [Y, M, D] = date.split('-').map(Number);
   const startOfDay = new Date(Y, M - 1, D, 0, 0, 0, 0);
   const endOfDay   = new Date(Y, M - 1, D, 23, 59, 59, 999);
 
-  // sort doctors to compute availability
-  const allDoctors = await Doctor.find(doctorFilters)
-    .sort(sort)
-    .select('doctorName specialty email phone')
-    .lean();
-
+  // Load all doctors
+  const { doctors: allDoctors } = await loadDoctorsAndCount(doctorFilters, sort, 0, 0, false);
   const doctorIds = allDoctors.map(d => d._id);
   if (doctorIds.length === 0) {
     return { page: _page, limit: _limit, total: 0, pages: 1, items: [] };
   }
 
-  // fetch availabilities
+  // fetch availabilities and already-taken hours
   const [avails, appts] = await Promise.all([
     Availability.find({
       doctorId: { $in: doctorIds },
@@ -90,11 +140,11 @@ async function findSlots({ date, specialty, name, page = 1, limit = 5 }) {
       end:   { $gt: startOfDay },
     })
       .select('doctorId start end')
-      .sort({ doctorId: 1, start: 1 }) // sort in right order
+      .sort({ doctorId: 1, start: 1 })
       .lean(),
     Appointment.find({
       doctorId: { $in: doctorIds },
-      status: 'BOOKED',
+      status: { $in: ['BOOKED', 'COMPLETED'] },
       start: { $lt: endOfDay },
       end:   { $gt: startOfDay },
     })
@@ -103,8 +153,8 @@ async function findSlots({ date, specialty, name, page = 1, limit = 5 }) {
   ]);
 
   // avails and booked hours
-  const availsByDoctor = new Map(); // doctorId >>[{start, end}]
-  const bookedByDoctor = new Map(); // doctorId >> Set(hour in local hour)
+  const availsByDoctor = new Map();
+  const bookedByDoctor = new Map();
 
   avails.forEach(a => {
     const key = String(a.doctorId);
@@ -116,7 +166,6 @@ async function findSlots({ date, specialty, name, page = 1, limit = 5 }) {
     const key = String(a.doctorId);
     if (!bookedByDoctor.has(key)) bookedByDoctor.set(key, new Set());
     const st = new Date(a.start);
-    // build a local "hour key": year, month, day, **local hour**, :00
     const localHourStart = new Date(
       st.getFullYear(), st.getMonth(), st.getDate(),
       st.getHours(), 0, 0, 0
@@ -124,7 +173,7 @@ async function findSlots({ date, specialty, name, page = 1, limit = 5 }) {
     bookedByDoctor.get(key).add(localHourStart);
   });
 
-  // build items for ALL doctors, compute slots, again, local date, then filter by "has any slots"
+  // compute slots, again, local date, then filter by available
   const allItems = allDoctors.map(d => {
     const key = String(d._id);
     const windows = (availsByDoctor.get(key) || [])
@@ -133,7 +182,7 @@ async function findSlots({ date, specialty, name, page = 1, limit = 5 }) {
     let slots = [];
 
     windows.forEach(w => {
-      // Clamp to **local** day bounds
+      // Clamp to local day bounds
       const ws = new Date(Math.max(new Date(w.start).getTime(), startOfDay.getTime()));
       const we = new Date(Math.min(new Date(w.end).getTime(),   endOfDay.getTime()));
       if (ws < we) slots.push(...sliceHourly(ws, we));
@@ -156,7 +205,7 @@ async function findSlots({ date, specialty, name, page = 1, limit = 5 }) {
     return {
       doctorId:   d._id,
       doctorName: d.doctorName,
-      specialty:  d.specialty,
+      specialization: d.specialization,
       email:      d.email,
       phone:      d.phone,
       availableSlots: slots, // [{start, end}]

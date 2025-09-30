@@ -1,9 +1,8 @@
+// src/pages/BookAppointment.jsx
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { bookAppointment, getPatient } from "../api/bookingApi";
+import { bookAppointment } from "../api/bookingApi"; // ⬅️ removed getPatient
 import "./BookAppointment.css";
-
-const PATIENT_ID = "68d7390ee32dab0569ecbf2f"; // mock patient only
 
 export default function BookAppointment() {
   const { state } = useLocation(); // { doctor, slotISO }
@@ -12,6 +11,7 @@ export default function BookAppointment() {
   const doctor = state?.doctor || {};
   const slotISO = state?.slotISO || null;
 
+  // Local form state (no mock prefill)
   const [patientName, setPatientName] = useState("");
   const [email, setEmail] = useState("");
   const [contactNumber, setContactNumber] = useState("");
@@ -19,20 +19,20 @@ export default function BookAppointment() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  // Prefill patient fields (name, contact, email if you have one)
+  // (Optional) best-effort prefill from a global auth user if app provides one.
+  // Safe no-op if nothing is available.
   useEffect(() => {
-    (async () => {
-      try {
-        if (typeof getPatient === "function") {
-          const p = await getPatient(PATIENT_ID);
-          setPatientName(p?.patientName || "");
-          setContactNumber(p?.contactNumber || "");
-          setEmail(p?.email || ""); // will stay blank if model has no email
-        }
-      } catch {
-
+    try {
+      const raw = localStorage.getItem("authUser");
+      if (raw) {
+        const u = JSON.parse(raw);
+        if (u?.name) setPatientName(u.name);
+        if (u?.email) setEmail(u.email);
+        if (u?.phone) setContactNumber(u.phone);
       }
-    })();
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   if (!doctor?.doctorId || !slotISO) {
@@ -59,8 +59,8 @@ export default function BookAppointment() {
     setError("");
     setSubmitting(true);
     try {
+      // No patientId sent — backend uses req.user from the auth token
       await bookAppointment({
-        patientId: PATIENT_ID,
         doctorId: doctor.doctorId,
         start: slotISO,
         reason: reason?.trim() || undefined,
@@ -85,10 +85,12 @@ export default function BookAppointment() {
         <div className="summary-card">
           <div className="summary-row">
             <span className="label-strong">Doctor:</span>
-            <span className="text">&nbsp;{doctor.doctorName}&nbsp;–&nbsp;{doctor.specialty}</span>
+            <span className="text">
+              &nbsp;{doctor.doctorName}&nbsp;–&nbsp;{doctor.specialty}
+            </span>
           </div>
 
-          {/* Line 2: Date | Time (center) | Duration (left with padding) */}
+          {/* Line 2: Date | Time | Duration */}
           <div className="summary-row summary-row--meta">
             <div className="meta-cell meta-left">
               <span className="label-strong">Date:</span>
@@ -106,12 +108,11 @@ export default function BookAppointment() {
         </div>
       </div>
 
-      {/* Patient Details */}
+      {/* Patient Details (purely for display/edit in UI) */}
       <div className="section">
         <div className="section-title">Patient Details</div>
 
         <div className="form-grid">
-          {/* Name spans full width */}
           <div className="form-field form-span-2">
             <label className="label">Name</label>
             <input

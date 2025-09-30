@@ -15,34 +15,28 @@ const {
   NoPastStartValidator
 } = require('../shared/validators/booking.validator.chain');
 
-const { appointmentObserver } = require('../shared/observers/appointments.observer');
-
-// TEMP debug logs only — AFTER the require - FIX LATER PLEASE
-console.log('authenticate:', typeof authenticate);
-console.log('requireRole:', typeof requireRole);
-console.log('searchDoctorsFacade:', typeof searchDoctorsFacade);
+const { appointmentObserver } = require('../shared/observers/appointments.observer.js');
 
 const router = express.Router();
 
-/** Search */
+/** Search doctors & availability */
 router.get('/search', authenticate, async (req, res) => {
-  // debug: ensure params arrive as expected
-  // console.log('[search] incoming query:', req.query);
   return searchDoctorsFacade(req, res);
 });
 
 /** Book Appointment */
-router.post('/book', authenticate, requireRole('patient'), async (req, res) => {
+router.post('/book', authenticate, requireRole('PATIENT'), async (req, res) => {
   try {
     const head = new Validator();
-    head.setNext(new StartRequiredValidator())
-        .setNext(new NoPastStartValidator());
+    head
+      .setNext(new StartRequiredValidator())
+      .setNext(new NoPastStartValidator());
 
     await head.handle({ body: req.body, user: req.user });
 
     const out = await bookAppointmentFacade(req, res);
 
-    // starts AFTER controller succeeded
+    // event (kept as-is)
     appointmentObserver.emit('appointment.booked', {
       patientId: req.body.patientId,
       doctorId: req.body.doctorId,
@@ -55,12 +49,13 @@ router.post('/book', authenticate, requireRole('patient'), async (req, res) => {
   }
 });
 
-/** Update Amppointment */
-router.patch('/appointments/:id', authenticate, requireRole('patient'), async (req, res) => {
+/** Update Appointment */
+router.patch('/appointments/:id', authenticate, requireRole('PATIENT'), async (req, res) => {
   try {
     const head = new Validator();
-    head.setNext(new StartRequiredValidator())
-        .setNext(new NoPastStartValidator());
+    head
+      .setNext(new StartRequiredValidator())
+      .setNext(new NoPastStartValidator());
 
     await head.handle({ body: req.body, user: req.user });
 
@@ -78,7 +73,7 @@ router.patch('/appointments/:id', authenticate, requireRole('patient'), async (r
 });
 
 /** Cancel Appointment */
-router.patch('/appointments/:id/cancel', authenticate, requireRole('patient'), async (req, res) => {
+router.patch('/appointments/:id/cancel', authenticate, requireRole('PATIENT'), async (req, res) => {
   try {
     const out = await cancelAppointmentFacade(req, res);
 
@@ -92,20 +87,19 @@ router.patch('/appointments/:id/cancel', authenticate, requireRole('patient'), a
   }
 });
 
-/** my appointments */
-router.get('/my', authenticate, requireRole('patient'), (req, res) =>
+/** My upcoming appointments */
+router.get('/my', authenticate, requireRole('PATIENT'), (req, res) =>
   getMyAppointmentsFacade(req, res)
 );
 
 router.get('/specialties', async (req, res) => {
   try {
-    const Doctor = require('../models/doctor.model');
-    const specialties = await Doctor.distinct('specialty', { specialty: { $ne: null } });
-    const cleaned = specialties
+    const DoctorProfile = require('../models/doctorProfile.model');
+    const specs = await DoctorProfile.distinct('specialization', { specialization: { $ne: null } });
+    const cleaned = specs
       .map(s => (typeof s === 'string' ? s.trim() : s))
       .filter(Boolean)
       .sort((a, b) => a.localeCompare(b));
-
     res.json(cleaned);
   } catch (e) {
     res.status(400).json({ error: e.message });

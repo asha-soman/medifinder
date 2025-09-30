@@ -1,4 +1,3 @@
-// src/pages/MyAppointments.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import {
   getMyAppointments,
@@ -7,8 +6,6 @@ import {
   cancelAppointmentApi,
 } from "../api/bookingApi";
 import "./MyAppointments.css";
-
-const DEFAULT_PATIENT_ID = "68d7390ee32dab0569ecbf2f"; // mock patient
 
 // DD-MM-YYYY
 const fmtDate = (iso) => {
@@ -35,12 +32,12 @@ export default function MyAppointments() {
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [changeReason, setChangeReason] = useState("");
 
-  // Load upcoming appointments
+  // Load upcoming appointments (no patientId — backend uses auth)
   useEffect(() => {
     (async () => {
       try {
         setLoading(true);
-        const list = await getMyAppointments(DEFAULT_PATIENT_ID);
+        const list = await getMyAppointments();
         setItems(list || []);
       } catch {
         setErr("Failed to load appointments.");
@@ -51,11 +48,11 @@ export default function MyAppointments() {
   }, []);
 
   const refresh = async () => {
-    const list = await getMyAppointments(DEFAULT_PATIENT_ID);
+    const list = await getMyAppointments();
     setItems(list || []);
   };
 
-  /* ---------------- Edit Flow ---------------- */
+  //edit flow
   const onEdit = (appt) => {
     setEditing(appt);
     setNewDate("");
@@ -80,7 +77,8 @@ export default function MyAppointments() {
     try {
       const data = await searchDoctors({
         name: editing.doctor.doctorName,
-        specialty: editing.doctor.specialty,
+        // specialization backend maps
+        specialty: editing.doctor.specialization,
         date: yyyyMmDd,
         page: 1,
         limit: 1,
@@ -179,7 +177,7 @@ export default function MyAppointments() {
                       {a?.doctor?.doctorName || "-"}
                     </div>
                     <div className="doc-spec body20">
-                      {a?.doctor?.specialty || "-"}
+                      {a?.doctor?.specialization || "-"}
                     </div>
                   </td>
                   <td className="center actions">
@@ -210,7 +208,7 @@ export default function MyAppointments() {
               <div className="row">
                 <div className="label">Doctor:</div>
                 <div className="value">
-                  {editing?.doctor?.doctorName} – {editing?.doctor?.specialty}
+                  {editing?.doctor?.doctorName} – {editing?.doctor?.specialization}
                 </div>
               </div>
 
