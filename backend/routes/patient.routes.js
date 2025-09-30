@@ -35,9 +35,8 @@ router.put(
     try {
       const patch = {
         dateOfBirth: req.body?.dateOfBirth,
-        phone: req.body?.phone,
+        contact: req.body?.contact,
         address: req.body?.address,
-        emergencyContact: req.body?.emergencyContact,
       };
       const updated = await PatientProfileService.update(req.user.sub, patch);
       res.json(updated);

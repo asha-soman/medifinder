@@ -2,12 +2,12 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getDoctorProfile, updateDoctorProfile } from "../api/doctor";
 import { Link } from "react-router-dom";
-import "./doctor-profile.css";
+import "./profile-page.css";
 
 const SPECIALTIES = [
-  "Cardiology", "Dermatology", "Endocrinology", "Gastroenterology", "General Practice",
-  "Neurology", "Obstetrics & Gynaecology", "Oncology", "Orthopaedics",
-  "Paediatrics", "Psychiatry", "Radiology", "Urology"
+  "Cardiology","Dermatology","Endocrinology","Gastroenterology","General Practice",
+  "Neurology","Obstetrics & Gynaecology","Oncology","Orthopaedics",
+  "Paediatrics","Psychiatry","Radiology","Urology"
 ];
 
 export default function DoctorProfile() {
@@ -19,6 +19,11 @@ export default function DoctorProfile() {
   const [editing, setEditing] = useState(false);
   const [err, setErr] = useState("");
   const [ok, setOk] = useState("");
+
+  // phone validation state
+  const [contactErr, setContactErr] = useState("");
+  const [contactTouched, setContactTouched] = useState(false);
+  const contactRef = useRef(null);
 
   const clean = (f) => ({
     specialization: (f.specialization || "").trim(),
@@ -56,32 +61,74 @@ export default function DoctorProfile() {
     return () => { ignore = true; };
   }, [token]);
 
+  // auto-dismiss banners
+  useEffect(() => {
+    if (!ok) return;
+    const t = setTimeout(() => setOk(""), 3500);
+    return () => clearTimeout(t);
+  }, [ok]);
+
+  useEffect(() => {
+    if (!err) return;
+    const t = setTimeout(() => setErr(""), 3500);
+    return () => clearTimeout(t);
+  }, [err]);
+
   function onChange(e) {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
     setOk("");
   }
 
+  // phone: keep only digits, cap at 10, show helper/error appropriately
+  const handleContactChange = (e) => {
+    const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
+    setForm((f) => ({ ...f, contact: digits }));
+    if (contactTouched) {
+      setContactErr(digits.length === 10 ? "" : "Enter exactly 10 digits.");
+    }
+    setOk("");
+  };
+
+  const handleContactBlur = () => {
+    setContactTouched(true);
+    setContactErr((form.contact || "").length === 10 ? "" : "Enter exactly 10 digits.");
+  };
+
   function startEdit() {
     setEditing(true);
     setOk(""); setErr("");
+    setContactErr("");
+    setContactTouched(false);
   }
 
   function cancelEdit() {
     setForm(baselineRef.current);
     setEditing(false);
     setOk(""); setErr("");
+    setContactErr("");
+    setContactTouched(false);
   }
 
   async function save() {
+    const digits = (form.contact || "").replace(/\D/g, "");
+    if (digits.length !== 10) {
+      setContactTouched(true);
+      setContactErr("Enter exactly 10 digits.");
+      setErr("Failed to update profile");
+      return;
+    }
+
     if (!isDirty) { setEditing(false); return; }
     setSaving(true); setErr(""); setOk("");
     try {
-      const payload = clean(form);
+      const payload = clean({ ...form, contact: digits });
       await updateDoctorProfile(token, payload);
       baselineRef.current = payload;
       setOk("Profile updated successfully.");
       setEditing(false);
+      setContactErr("");
+      setContactTouched(false);
     } catch (e) {
       setErr(e?.message || "Failed to update profile");
     } finally {
@@ -147,8 +194,6 @@ export default function DoctorProfile() {
         </div>
       </header>
 
-
-      {/* Content */}
       <main className="container profile-container profile-content mt-5">
         <div className="visually-hidden" aria-live="polite">
           {ok || err}
@@ -174,10 +219,10 @@ export default function DoctorProfile() {
                 <>
                   <div className="d-flex align-items-center mb-3">
                     <div className="profile-ring me-3">
-                      <div className="profile" aria-hidden="true">{initials}</div>
+                      <div className="profile" aria-hidden="true">{initials.toUpperCase()}</div>
                     </div>
                     <div>
-                      <div className="h5 mb-1">{user?.name || "Doctor"}</div>
+                      <div className="h5 mb-1">{user?.name.toUpperCase() || "Doctor"}</div>
                     </div>
                   </div>
 
@@ -191,6 +236,7 @@ export default function DoctorProfile() {
             </div>
           </aside>
 
+          {/* Form */}
           <section className="col-12 col-lg-8">
             <div className="card card-glass">
               <div className="d-flex align-items-center gap-2 mb-2">
@@ -235,11 +281,14 @@ export default function DoctorProfile() {
                       <datalist id="specialty-list">
                         {SPECIALTIES.map((s) => <option key={s} value={s} />)}
                       </datalist>
-                    </div>               
+                    </div>
+
                     <div className="col-12">
                       <label className="form-label field-label" htmlFor="pf-contact">Contact Number</label>
                       <div className="input-group">
-                        <span className="input-group-text field-icon" aria-hidden="true">☎</span>
+                        <span className="input-group-text field-icon" aria-hidden="true">
+                          <i className="bi bi-telephone"></i>
+                        </span>
                         <input
                           id="pf-contact"
                           type="tel"
@@ -247,15 +296,26 @@ export default function DoctorProfile() {
                           className="form-control field-input"
                           placeholder="(07) 1234 5678"
                           value={form.contact}
-                          onChange={onChange}
+                          onChange={handleContactChange}
+                          onBlur={handleContactBlur}
                           disabled={!editing}
+                          inputMode="numeric"
                           autoComplete="tel"
+                          maxLength={10}
+                          aria-invalid={contactErr ? "true" : "false"}
+                          aria-describedby="contact-help contact-error"
+                          ref={contactRef}
                         />
                       </div>
+
+                      {/* helper while editing & partially filled */}
+                      {editing && !contactErr && form.contact.length > 0 && form.contact.length < 10 && (
+                        <div id="contact-help" className="form-text d-block mt-1">Enter exactly 10 digits.</div>
+                      )}
+                      {/* validation error */}
+                      {contactErr && <div id="contact-error" className="field-error mt-1">{contactErr}</div>}
                     </div>
                   </div>
-
-                  {/* (Bottom actions removed; actions now live in header) */}
                 </form>
               )}
             </div>

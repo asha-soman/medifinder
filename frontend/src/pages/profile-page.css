@@ -83,12 +83,23 @@
   box-shadow:0 8px 20px rgba(47,125,46,.25);
 }
 
-.info-list li{
-  display:flex; 
-  justify-content:space-between; 
-  gap:.75rem;
-  padding:.55rem 0; 
+.info-list {
+  margin: 0;
+  padding: 0;
 }
+
+.info-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .6rem 0;
+  border-bottom: 2px dashed var(--stroke, #e6edf4);
+}
+
+.info-list li:last-child {
+  border-bottom: 0;
+}
+
 
 .right-heading{ 
   color: #035c74;
@@ -150,5 +161,7 @@
   gap: 8px;
   flex-wrap: wrap;
 }
+
+.field-error { color: #dc3545; font-size: 0.9rem; }
 
 @media (min-width:768px){ .card{ padding:1.6rem 1.8rem; } }

@@ -15,9 +15,8 @@ class PatientProfileService {
   async _updateRaw(userId, patch) {
     const allowed = {};
     if (patch?.dateOfBirth) allowed.dateOfBirth = patch.dateOfBirth;
-    if (typeof patch?.phone === "string") allowed.phone = patch.phone.trim();
+    if (typeof patch?.contact === "string") allowed.contact = patch.contact.trim();
     if (typeof patch?.address === "string") allowed.address = patch.address.trim();
-    if (typeof patch?.emergencyContact === "string") allowed.emergencyContact = patch.emergencyContact.trim();
 
     const before = (await PatientProfile.findOne({ userId }))?.toObject() || {};
     const result = await PatientProfile.findOneAndUpdate(
