@@ -84,7 +84,7 @@ export default function Landing() {
         <div className="container-fluid trust-grid mt-5 mb-5">
           <div className="trust-item">
             <div className="trust-value">120+</div>
-            <div className="trust-label">Clinics</div>
+            <div className="trust-label">Doctors</div>
           </div>
           <div className="trust-item">
             <div className="trust-value">5k+</div>

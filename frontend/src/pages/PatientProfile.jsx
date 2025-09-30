@@ -210,10 +210,10 @@ export default function PatientProfile() {
         {err && <div className="alert alert-danger mb-4" role="alert">{err}</div>}
         {ok && <div className="alert alert-success mb-4" role="status">{ok}</div>}
 
-        <div className="row g-4">
+        <div className="row g-5">
           {/* Summary */}
           <aside className="col-12 col-lg-4">
-            <div className="card card-glass">
+            <div className="card card-glass card-gradient">
               {loading ? (
                 <div>
                   <div className="skel skel-profile mb-3" />
@@ -245,9 +245,9 @@ export default function PatientProfile() {
 
           {/* Form */}
           <section className="col-12 col-lg-8">
-            <div className="card card-glass">
+            <div className="card card-glass card-gradient">
               <div className="d-flex align-items-center gap-2 mb-2">
-                <h2 className="h5 mb-0 fw-semibold mb-3 right-heading">Personal Details</h2>
+                <h4 className="mb-0 fw-semibold mb-3 right-heading">Personal Details</h4>
               </div>
 
               {loading ? (
@@ -259,7 +259,7 @@ export default function PatientProfile() {
               ) : (
                 <form onSubmit={(e) => e.preventDefault()} noValidate>
                   <div className="row g-3">
-                    <div className="col-12">
+                    <div className="col-12 mb-3">
                       <label className="form-label field-label" htmlFor="pp-name">Name</label>
                       <input
                         id="pp-name"
@@ -271,7 +271,7 @@ export default function PatientProfile() {
                       />
                     </div>
 
-                    <div className="col-md-6 col-12">
+                    <div className="col-md-6 col-12 mb-3">
                       <label className="form-label field-label" htmlFor="pp-dob">Date of Birth</label>
                       <input
                         id="pp-dob"
@@ -284,7 +284,7 @@ export default function PatientProfile() {
                       />
                     </div>
 
-                    <div className="col-md-6 col-12">
+                    <div className="col-md-6 col-12 mb-3">
                       <label className="form-label field-label" htmlFor="pp-contact">Phone</label>
                       <div className="input-group">
                         <span className="input-group-text field-icon" aria-hidden="true">
@@ -318,7 +318,7 @@ export default function PatientProfile() {
                     </div>
 
 
-                    <div className="col-12">
+                    <div className="col-12 mb-5">
                       <label className="form-label field-label" htmlFor="pp-address">Address</label>
                       <textarea
                         id="pp-address"

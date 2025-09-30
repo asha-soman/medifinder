@@ -61,7 +61,6 @@ export default function DoctorProfile() {
     return () => { ignore = true; };
   }, [token]);
 
-  // auto-dismiss banners
   useEffect(() => {
     if (!ok) return;
     const t = setTimeout(() => setOk(""), 3500);
@@ -80,7 +79,6 @@ export default function DoctorProfile() {
     setOk("");
   }
 
-  // phone: keep only digits, cap at 10, show helper/error appropriately
   const handleContactChange = (e) => {
     const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
     setForm((f) => ({ ...f, contact: digits }));
@@ -205,7 +203,7 @@ export default function DoctorProfile() {
         <div className="row g-4">
           {/* Summary */}
           <aside className="col-12 col-lg-4">
-            <div className="card card-glass">
+            <div className="card card-gradient">
               {loading ? (
                 <div>
                   <div className="skel skel-profile mb-3" />
@@ -238,9 +236,9 @@ export default function DoctorProfile() {
 
           {/* Form */}
           <section className="col-12 col-lg-8">
-            <div className="card card-glass">
+            <div className="card card-glass card-gradient">
               <div className="d-flex align-items-center gap-2 mb-2">
-                <h2 className="h5 mb-0 fw-semibold mb-3 right-heading">Professional Details</h2>
+                <h4 className="mb-0 fw-semibold mb-3 right-heading">Professional Details</h4>
               </div>
 
               {loading ? (
@@ -253,7 +251,7 @@ export default function DoctorProfile() {
               ) : (
                 <form onSubmit={(e) => e.preventDefault()} noValidate>
                   <div className="row g-3">
-                    <div className="col-12">
+                    <div className="col-12 mb-3">
                       <label className="form-label field-label" htmlFor="pf-name">Name</label>
                       <input
                         id="pf-name"
@@ -265,7 +263,7 @@ export default function DoctorProfile() {
                       />
                     </div>
 
-                    <div className="col-12">
+                    <div className="col-12 mb-3">
                       <label className="form-label field-label" htmlFor="pf-spec">Specialization</label>
                       <input
                         id="pf-spec"
@@ -283,7 +281,7 @@ export default function DoctorProfile() {
                       </datalist>
                     </div>
 
-                    <div className="col-12">
+                    <div className="col-12 mb-5">
                       <label className="form-label field-label" htmlFor="pf-contact">Contact Number</label>
                       <div className="input-group">
                         <span className="input-group-text field-icon" aria-hidden="true">
@@ -308,7 +306,7 @@ export default function DoctorProfile() {
                         />
                       </div>
 
-                      {/* helper while editing & partially filled */}
+                      {/* helper message while editing & partially filled */}
                       {editing && !contactErr && form.contact.length > 0 && form.contact.length < 10 && (
                         <div id="contact-help" className="form-text d-block mt-1">Enter exactly 10 digits.</div>
                       )}
