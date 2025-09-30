@@ -213,7 +213,7 @@ const updateAppointment = async (req, res) => {
     const overlappingPatient = await Appointment.findOne({
       _id: { $ne: appt._id },
       patientId: appt.patientId,
-      status: { $in: ['BOOKED'] },
+      status: 'BOOKED',
       $or: [
         { start: { $lt: endDate, $gte: startDate } },
         { end: { $gt: startDate, $lte: endDate } },
