@@ -1,87 +1,65 @@
-.mf-header{
-  background:#173e59;
-  position:sticky;
-  top:0;z-index:50
+.header {
+  background: #173e59;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.mf-header__inner{
-  width:100%;margin:0;
-  padding:10px 16px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 32px;
 }
 
-.mf-header__inner--gutter{
-  padding-left:clamp(20px,5vw,48px);
-  padding-right: clamp(64px, 8vw, 120px); 
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
 }
 
-.mf-brand{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;color:#fff;
-  text-decoration:none
+.header-brand-text {
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: -0.2px;
 }
 
-.mf-brand__text{
-  font-weight:400;
-  letter-spacing:.2px;
-  font-size: 30px;
+.header-brand-medi {
+  color: #3de567;
 }
 
-.mf-brand__medi{
-  color:#45c264
+.header-logo {
+  width: 32px;    
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.20);
 }
 
-.mf-brand__badge{
-  width:28px;
-  height:28px;
-  display:grid;
-  place-items:center;
-  border-radius:999px;
-  box-shadow:0 2px 6px rgba(0,0,0,.25), inset 0 1px 1px rgba(255,255,255,.25);
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 64px;
 }
 
-.mf-nav{
-  display:inline-flex;
-  gap:8px;
-  margin-left:auto;            
-  padding-right: clamp(28px, 5vw, 96px);
+.btn-success { 
+  border-radius: 0.3rem; 
+  background-color: #23a844;;
 }
 
-.mf-btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  height:34px;
-  padding:0 14px;
-  border-radius:8px;
-  font-weight:500;
-  text-decoration:none
+.btn-outline-light:hover { 
+  background: #fff; 
+  color: #173e59; 
 }
 
-.mf-btn--ghost{
-  color:#e8f3fb;
-  border:1px solid rgba(255,255,255,.35)
-}
-
-.mf-btn--ghost:hover{
-  background:rgba(255,255,255,.08)
-}
-
-.mf-btn--primary{
-  background:#3aa655;
-  color:#fff
-}
-
-.mf-btn--primary:hover{
-  filter:brightness(.95)
-}
-
-
-@media (min-width: 1200px) {
-  .mf-header__inner--gutter {
-    padding-right: 144px;
-  }
+/* ---------- Responsive ---------- */
+@media (max-width: 576px) {
+  .header-container { padding: 8px 16px; }
+  .header-brand-text { font-size: 22px; }
+  .header-nav { padding-right: 16px; }
 }

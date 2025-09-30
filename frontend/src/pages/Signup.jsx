@@ -13,96 +13,95 @@ export default function Signup() {
   const { register } = useAuth();
   const nav = useNavigate();
 
-
-async function onSubmit(e){
-  e.preventDefault(); 
-  setErr("");
-  try{
-    await register(name, email, role, password);   
-    nav("/login", { replace: true, state: { email } });
-  }catch(e){ 
-    setErr(e.message || "Signup failed"); 
+  async function onSubmit(e) {
+    e.preventDefault();
+    setErr("");
+    try {
+      await register(name, email, role, password);
+      nav("/login", { replace: true, state: { email } });
+    } catch (e) {
+      setErr(e.message || "Signup failed");
+    }
   }
-}
-
 
   return (
-    <>
-      <section className="mf-hero" role="img" aria-label="Healthcare background">
-        <div className="mf-hero__center">
-          <form className="mf-card" onSubmit={onSubmit}>
-            <h1 className="mf-card__title">
-              <span className="mf-accent">Sign</span> Up
-            </h1>
+    <section className="auth-hero" aria-label="Healthcare background">
+      <div className="auth-hero-center">
+        <form className="auth-card" onSubmit={onSubmit} noValidate>
+          <h1 className="auth-card-title">
+            <span className="auth-accent">Sign</span> Up
+          </h1>
 
-            {err && <div className="mf-error" role="alert">{err}</div>}
-
-            <label className="mf-label" htmlFor="su-name">Full name</label>
-            <input
-              id="su-name"
-              className="mf-input"
-              placeholder="Full name"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              required
-              autoComplete="name"
-            />
-
-            <label className="mf-label" htmlFor="su-email">Email</label>
-            <input
-              id="su-email"
-              className="mf-input"
-              placeholder="you@example.com"
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-            />
-
-            <label className="mf-label" htmlFor="su-pass">Password</label>
-            <div className="input-group input-group-lg">
-              <input
-                id="su-pass"
-                className="form-control"
-                type={showPwd ? "text" : "password"}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="new-password"
-              />
-              <button
-                type="button"
-                className="btn btn-outline-secondary"
-                onClick={() => setShowPwd((s) => !s)}
-                aria-label={showPwd ? "Hide password" : "Show password"}
-              >
-                <i className={`bi ${showPwd ? "bi-eye-slash" : "bi-eye"}`} />
-              </button>
+          {err && (
+            <div className="auth-error" role="alert">
+              {err}
             </div>
+          )}
 
+          <label className="auth-label" htmlFor="su-name">Full name</label>
+          <input
+            id="su-name"
+            className="auth-input"
+            placeholder="Full name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            autoComplete="name"
+          />
 
-            <label className="mf-label" htmlFor="su-role">Role</label>
-            <select
-              id="su-role"
-              className="mf-input"
-              value={role}
-              onChange={e => setRole(e.target.value)}
+          <label className="auth-label" htmlFor="su-email">Email</label>
+          <input
+            id="su-email"
+            className="auth-input"
+            type="email"
+            placeholder="Email Id"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoComplete="email"
+          />
+
+          <label className="auth-label" htmlFor="su-pass">Password</label>
+          <div className="input-group input-group-lg">
+            <input
+              id="su-pass"
+              className="form-control"
+              type={showPwd ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="new-password"
+            />
+            <button
+              type="button"
+              className="btn btn-light btn-eye"
+              onClick={() => setShowPwd((s) => !s)}
+              aria-label={showPwd ? "Hide password" : "Show password"}
+              aria-pressed={showPwd}
             >
-              <option value="patient">Patient</option>
-              <option value="doctor">Doctor</option>
-            </select>
+              <i className={`bi ${showPwd ? "bi-eye-slash" : "bi-eye"}`} />
+            </button>
+          </div>
 
-            <button className="mf-cta" type="submit">Create an Account</button>
+          <label className="auth-label" htmlFor="su-role">Role</label>
+          <select
+            id="su-role"
+            className="auth-input"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+          >
+            <option value="patient">Patient</option>
+            <option value="doctor">Doctor</option>
+          </select>
 
-            <p className="mf-help">
-              Already have an account? <Link to="/login">Login</Link>
-            </p>
-          </form>
-        </div>
-      </section>
-    </>
+          <button className="auth-cta" type="submit">Create an Account</button>
+
+          <p className="auth-help">
+            Already have an account? <Link to="/login">Login</Link>
+          </p>
+        </form>
+      </div>
+    </section>
   );
-
 }
