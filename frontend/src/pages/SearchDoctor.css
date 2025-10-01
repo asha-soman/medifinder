@@ -1,0 +1,142 @@
+/* hero - image and the lines */
+.hero { 
+    position: relative;
+    padding-top: 0;
+    min-height: 520px;
+    overflow: hidden;
+}
+
+.hero-image {
+    position: absolute;
+    top: 0; right: 35px;
+    height: 95%;
+    max-height: 560px;
+    width: auto;
+    object-fit: contain;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.hero-copy {
+    position: relative;
+    z-index: 2;
+    margin-left: 104px;
+    margin-top: 102px;
+    font-family: "Poppins", sans-serif; color: #1B3951;
+}
+
+.hero-line1,.hero-line2{
+    margin:0;
+    font-weight:600;
+    font-size:40px;
+    line-height:46px;
+}
+
+.hero-line1{width:495px;} .hero-line2{width:593px;}
+.hero-sub{width:625px;font-weight:400;font-size:20px;line-height:26px;margin-top:25px;color:#1F2937;}
+.accent{color:#6EAB36;}
+
+/* find a doctor frame */
+.search-card{
+    width:1240px;
+    min-height:150px;
+    margin:0 auto 8px;
+    background:#FAFAFA;
+    border-radius:12px;
+    padding:16px 24px;
+    box-sizing:border-box;
+}
+
+.card-title{
+    font-family:'Poppins',sans-serif;
+    font-weight:600;
+    font-size:30px;
+    line-height:34px;
+    color:#1B3951;
+    text-align:left;
+    margin:6px 0 12px;
+}
+
+.filters-row{display:grid;
+  grid-template-columns:296px 296px 296px 201px;
+  gap:24px;align-items:end;}
+
+.search-card__input{height:44.33px;
+  border-radius:8px;
+  border:1px solid #4E7472;
+  background:#FFFFFF;padding:0 12px;
+  box-sizing:border-box;width:100%;
+  font-family:'Poppins',sans-serif;
+  font-size:20px;color:#111827;
+  line-height:44.33px;}
+.search-card__input::placeholder{color:#555555;}
+select.search-card__input,input[type="date"].search-card__input{appearance:none;-webkit-appearance:none;-moz-appearance:none;}
+
+.search-card__btn{height:44.33px;
+  width:201px;border-radius:8px;
+  background:#1B3951;
+  border:1px solid #1B3951;
+  color:#FFFFFF;
+  font-family:'Poppins',sans-serif;
+  font-size:20px;
+  font-weight:500;}
+
+/* right-aligned next-available hint */
+.auto-hint{width:1240px;max-width:92vw;margin:6px auto 0;padding:5px 24px;font-family:"Poppins",sans-serif;font-weight:400;font-size:14px;color:#555;text-align:right;box-sizing:border-box;}
+
+/* ---------- RESULTS ---------- */
+.results{width:1240px;max-width:92vw;margin:12px auto 40px;}
+.result-card{display:grid;grid-template-columns:296px 24px 296px 24px 296px 24px 201px;align-items:start;gap:0;padding:14px 24px;border:1px solid #E5E7EB;border-radius:12px;background:#fff;margin-bottom:12px;}
+.left-stack{grid-column:1 / 6;}
+.book-col{grid-column:7 / 8;display:flex;justify-content:flex-end;align-items:center;height:100%;}
+
+.doctor-name{font-family:'Poppins',sans-serif;font-weight:600;font-size:24px;line-height:1.2;color:#1B3951;}
+.doctor-spec{font-family:'Poppins',sans-serif;font-weight:400;font-size:20px;line-height:1.2;color:#1B3951;margin:2px 0 10px;}
+
+.slot-wrap{display:flex;flex-wrap:wrap;gap:8px;}
+.slot{width:120px;height:38.24px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:#D3D3D3;border:1px solid #D3D3D3;color:#1B3951;
+  font-family:'Poppins',sans-serif;font-weight:600;font-size:20px;cursor:pointer;transition:filter .15s ease,transform .05s ease;}
+.slot:hover{filter:brightness(0.98);} .slot:active{transform:translateY(1px);}
+.slot-active{background:#1B3951;border-color:#1B3951;color:#D3D3D3;}
+
+.btn-book{width:120px;height:38.24px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:#6EAB36;color:#fff;border:1px solid #6EAB36;
+  font-family:'Poppins',sans-serif;font-weight:600;font-size:18px;transition:filter .15s ease,transform .05s ease;cursor:pointer;}
+.btn-book:hover{filter:brightness(1.05);} .btn-book:active{transform:translateY(1px);}
+
+.muted{color:#6B7280;} .form-error{margin-top:10px;color:#B91C1C;font-size:13px;}
+
+/* ---------- Pagination (centered, text-only & SCOPED) ---------- */
+.search-page__pagination{display:flex;align-items:center;justify-content:center;gap:50px;margin:24px 0 8px;font-family:"Poppins",sans-serif;user-select:none;}
+.search-page__page-link{background:transparent;border:none;font-size:20px;font-weight:600;color:#9CA3AF;cursor:pointer;padding:4px 2px;}
+.search-page__page-link.is-active{color:#111827;}
+.search-page__page-link:disabled{opacity:.35;cursor:not-allowed;}
+.search-page__chev{font-size:22px;}
+
+/* ---- Stats block (unchanged) ---- */
+.site-stats{width:1240px;max-width:92vw;margin:100px auto 36px;text-align:center;}
+.stats-heading{font-family:"Poppins",sans-serif;font-weight:700;font-size:28px;line-height:1.3;color:#1B3951;margin:0 0 72px;}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:36px;align-items:start;justify-items:center;margin-bottom:60px;}
+.stat-number{font-family:"Poppins",sans-serif;font-weight:700;font-size:42px;line-height:1;color:#6EAB36;margin-bottom:8px;}
+.stat-label{font-family:"Poppins",sans-serif;font-weight:500;font-size:18px;color:#1B3951;}
+.stats-tagline{margin:40px 0 40px;font-family:"Poppins",sans-serif;font-weight:700;font-size:26px;color:#6EAB36;}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:1300px){.search-card{width:92vw;} .results{width:92vw;} .auto-hint{width:92vw;}}
+@media (max-width:1100px){
+  .result-card{grid-template-columns:1fr 201px;padding:14px 16px;}
+  .left-stack{grid-column:1 / 2;} .book-col{grid-column:2 / 3;}
+}
+@media (max-width:640px){
+  .filters-row{grid-template-columns:1fr;row-gap:12px;}
+  .result-card{grid-template-columns:1fr;}
+  .book-col{justify-content:stretch;}
+  .btn-book{width:100%;}
+  .stats-grid{grid-template-columns:1fr 1fr;gap:20px;}
+}
+@media (max-width:520px){
+  .stats-grid{grid-template-columns:1fr;}
+  .stats-heading{font-size:24px;}
+  .stat-number{font-size:32px;}
+  .stat-label{font-size:16px;}
+  .stats-tagline{font-size:20px;}
+}

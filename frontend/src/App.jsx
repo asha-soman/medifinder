@@ -1,9 +1,11 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import RequireAuth from "./components/RequireAuth";
 import AppLayout from "./layouts/AppLayout";
+import PatientLayout from "./layouts/PatientLayout";
 
+// public pages and dashboard (did not change anything with the logic)
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import PatientDashboard from "./pages/PatientDashboard";
@@ -12,6 +14,11 @@ import Landing from "./pages/Landing";
 import DoctorProfile from "./pages/DoctorProfile";
 import PatientProfile from "./pages/PatientProfile";
 
+
+// patient booking pages
+import SearchDoctor from "./pages/SearchDoctor";
+import BookAppointment from "./pages/BookAppointment";
+import MyAppointments from "./pages/MyAppointments";
 
 export default function App() {
   return (
@@ -38,7 +45,7 @@ export default function App() {
                 </RequireAuth>
               }
             />
-            <Route
+             <Route
               path="/doctor/profile"
               element={
                 <RequireAuth role="doctor">
@@ -55,8 +62,21 @@ export default function App() {
               }
             />
 
-
             <Route path="*" element={<Login />} />
+          </Route>
+
+          {/** Patient Booking Section- */}
+          <Route
+            element={
+              <RequireAuth role="patient">
+                <PatientLayout /> {/* pulls the layout for patients */}
+              </RequireAuth>
+            }
+          >
+            <Route path="/" element={<Navigate to="/patient/search" replace />} />
+            <Route path="/patient/search" element={<SearchDoctor />} />
+            <Route path="/patient/book" element={<BookAppointment />} />
+            <Route path="/patient/my-appointments" element={<MyAppointments />} />
           </Route>
         </Routes>
       </BrowserRouter>
