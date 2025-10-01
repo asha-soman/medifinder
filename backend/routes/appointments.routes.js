@@ -1,3 +1,4 @@
+// revised this too
 const express = require('express');
 const { authenticate, requireRole } = require('../middleware/auth.middleware');
 
@@ -25,7 +26,7 @@ router.get('/search', authenticate, async (req, res) => {
 });
 
 /** Book Appointment */
-router.post('/book', authenticate, requireRole('PATIENT'), async (req, res) => {
+router.post('/book', authenticate, requireRole('patient'), async (req, res) => {
   try {
     const head = new Validator();
     head
@@ -36,10 +37,10 @@ router.post('/book', authenticate, requireRole('PATIENT'), async (req, res) => {
 
     const out = await bookAppointmentFacade(req, res);
 
-    // event (kept as-is)
+    // Observer event
     appointmentObserver.emit('appointment.booked', {
-      patientId: req.body.patientId,
-      doctorId: req.body.doctorId,
+      patientUserId: req.body.patientUserId,
+      doctorUserId: req.body.doctorUserId,
       start: req.body.start,
     });
 
@@ -50,7 +51,7 @@ router.post('/book', authenticate, requireRole('PATIENT'), async (req, res) => {
 });
 
 /** Update Appointment */
-router.patch('/appointments/:id', authenticate, requireRole('PATIENT'), async (req, res) => {
+router.patch('/appointments/:id', authenticate, requireRole('patient'), async (req, res) => {
   try {
     const head = new Validator();
     head
@@ -73,7 +74,7 @@ router.patch('/appointments/:id', authenticate, requireRole('PATIENT'), async (r
 });
 
 /** Cancel Appointment */
-router.patch('/appointments/:id/cancel', authenticate, requireRole('PATIENT'), async (req, res) => {
+router.patch('/appointments/:id/cancel', authenticate, requireRole('patient'), async (req, res) => {
   try {
     const out = await cancelAppointmentFacade(req, res);
 
@@ -88,10 +89,11 @@ router.patch('/appointments/:id/cancel', authenticate, requireRole('PATIENT'), a
 });
 
 /** My upcoming appointments */
-router.get('/my', authenticate, requireRole('PATIENT'), (req, res) =>
+router.get('/my', authenticate, requireRole('patient'), (req, res) =>
   getMyAppointmentsFacade(req, res)
 );
 
+/** Get all distinct specialties */
 router.get('/specialties', async (req, res) => {
   try {
     const DoctorProfile = require('../models/doctorProfile.model');

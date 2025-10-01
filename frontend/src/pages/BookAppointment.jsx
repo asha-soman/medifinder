@@ -1,7 +1,7 @@
-// src/pages/BookAppointment.jsx
+// revised this
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { bookAppointment } from "../api/bookingApi"; // ⬅️ removed getPatient
+import { bookAppointment, getMe } from "../api/bookingApi"; // add getMe
 import "./BookAppointment.css";
 
 export default function BookAppointment() {
@@ -11,7 +11,10 @@ export default function BookAppointment() {
   const doctor = state?.doctor || {};
   const slotISO = state?.slotISO || null;
 
-  // Local form state (no mock prefill)
+  // Logged-in user (to send patientUserId)
+  const [me, setMe] = useState(null);
+
+  // Local form state (display only)
   const [patientName, setPatientName] = useState("");
   const [email, setEmail] = useState("");
   const [contactNumber, setContactNumber] = useState("");
@@ -19,20 +22,30 @@ export default function BookAppointment() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  // (Optional) best-effort prefill from a global auth user if app provides one.
-  // Safe no-op if nothing is available.
+  // Prefill from /me (authoritative) + localStorage fallback (optional)
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem("authUser");
-      if (raw) {
-        const u = JSON.parse(raw);
+    (async () => {
+      try {
+        const u = await getMe();
+        if (u?._id) setMe(u);
         if (u?.name) setPatientName(u.name);
         if (u?.email) setEmail(u.email);
         if (u?.phone) setContactNumber(u.phone);
+      } catch {
+        // fallback to whatever is in localStorage if present
+        try {
+          const raw = localStorage.getItem("authUser");
+          if (raw) {
+            const loc = JSON.parse(raw);
+            if (loc?._id && !me) setMe(loc);
+            if (loc?.name && !patientName) setPatientName(loc.name);
+            if (loc?.email && !email) setEmail(loc.email);
+            if (loc?.phone && !contactNumber) setContactNumber(loc.phone);
+          }
+        } catch {/* ignore */}
       }
-    } catch {
-      /* ignore */
-    }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!doctor?.doctorId || !slotISO) {
@@ -49,6 +62,9 @@ export default function BookAppointment() {
     );
   }
 
+  // Optional hard block if user isn’t a patient
+  const notPatient = me && me.role && me.role.toLowerCase() !== "patient";
+
   const local = new Date(slotISO);
   const prettyDate = local.toLocaleDateString([], {
     weekday: "long", year: "numeric", month: "long", day: "numeric",
@@ -59,12 +75,21 @@ export default function BookAppointment() {
     setError("");
     setSubmitting(true);
     try {
-      // No patientId sent — backend uses req.user from the auth token
+      if (!me?._id) {
+        throw new Error("You must be signed in to book.");
+      }
+      if (notPatient) {
+        throw new Error("Only patients can book appointments.");
+      }
+
+      // IMPORTANT: send the *new* keys the backend expects
       await bookAppointment({
-        doctorId: doctor.doctorId,
+        patientUserId: me._id,           // ⬅️ from /me
+        doctorUserId: doctor.doctorId,   // ⬅️ map doctorId → doctorUserId
         start: slotISO,
         reason: reason?.trim() || undefined,
       });
+
       navigate("/patient/my-appointments", { replace: true });
     } catch (e) {
       setError(e?.response?.data?.error || e?.message || "Booking failed.");
@@ -108,7 +133,7 @@ export default function BookAppointment() {
         </div>
       </div>
 
-      {/* Patient Details (purely for display/edit in UI) */}
+      {/* Patient Details (display-only for now) */}
       <div className="section">
         <div className="section-title">Patient Details</div>
 
@@ -159,11 +184,16 @@ export default function BookAppointment() {
       </div>
 
       {error && <div className="error-block">{error}</div>}
+      {notPatient && (
+        <div className="error-block">
+          You are signed in as <strong>{me?.role}</strong>. Only patients can book.
+        </div>
+      )}
 
       {/* Actions */}
       <div className="actions">
         <button className="btn btn-cancel" onClick={() => navigate(-1)}>Cancel</button>
-        <button className="btn btn-primary" onClick={onSubmit} disabled={submitting}>
+        <button className="btn btn-primary" onClick={onSubmit} disabled={submitting || notPatient}>
           {submitting ? "Booking…" : "Book"}
         </button>
       </div>
