@@ -16,7 +16,9 @@ export default function SiteHeader() {
       role = storedUser?.role;
     } catch { }
   }
+
   const isPatient = authed && role === "patient";
+  const isDoctor = authed && role === "doctor";
 
   const handleLogout = () => {
     logout?.();
@@ -46,11 +48,13 @@ export default function SiteHeader() {
         </Link>
 
         <nav className="header-nav">
+          {/* Patient Links */}
           {isPatient && (
             <div className="header-links">
               <Link to="/patient/search" className="header-link">
-                <i class="bi bi-search-heart me-1" aria-hidden="true"></i>
-                Find a Doctor</Link>
+                <i className="bi bi-search-heart me-1" aria-hidden="true"></i>
+                Find a Doctor
+              </Link>
               <Link to="/patient/my-appointments" className="header-link">
                 <i className="bi bi-calendar-check me-1" aria-hidden="true"></i>
                 My Appointments
@@ -60,16 +64,39 @@ export default function SiteHeader() {
                 History
               </Link>
               <Link to="/patient/notifications" className="header-link">
-                <i class="bi bi-bell-fill me-1" aria-hidden="true"></i>
-                Notification</Link>
+                <i className="bi bi-bell-fill me-1" aria-hidden="true"></i>
+                Notifications
+              </Link>
               <Link to="/patient/profile" className="header-link">
                 <i className="bi bi-person-circle me-1" aria-hidden="true"></i>
                 Profile
               </Link>
-
             </div>
           )}
 
+          {/* Doctor Links */}
+          {isDoctor && (
+            <div className="header-links">
+              <Link to="/doctor/appointments" className="header-link">
+                <i className="bi bi-calendar-check me-1" aria-hidden="true"></i>
+                My Appointments
+              </Link>
+              <Link to="/doctor/availability" className="header-link">
+                <i className="bi bi-calendar-event me-1" aria-hidden="true"></i>
+                Manage Schedule
+              </Link>
+              <Link to="/doctor/history" className="header-link">
+                <i className="bi bi-clock-history me-1" aria-hidden="true"></i>
+                History
+              </Link>
+              <Link to="/doctor/profile" className="header-link">
+                <i className="bi bi-person-circle me-1" aria-hidden="true"></i>
+                Profile
+              </Link>
+            </div>
+          )}
+
+          {/* Auth buttons */}
           {authed ? (
             <button
               onClick={handleLogout}

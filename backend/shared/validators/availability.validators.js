@@ -24,8 +24,35 @@ class TimeOrderValidator extends Validator {
     }
 }
 
+class DoctorAvailableValidator extends Validator {
+    async handle(ctx) {
+        const { body } = ctx;
+        const { doctorId, start, end } = body;
+
+        if (!doctorId || !start || !end) {
+            throw new Error("doctorId, start and end are required");
+        }
+
+        // find a window that covers this appointment
+        const slot = await Availability.findOne({
+            doctorUserId: doctorId,
+            startTime: { $lte: new Date(start) },
+            endTime: { $gte: new Date(end) },
+            isBlocked: false
+        }).lean();
+
+        if (!slot) {
+            throw new Error("Doctor not available at this time");
+        }
+
+        return super.handle(ctx);
+    }
+}
+
+
 module.exports = {
     Validator,
     RequiredFieldsValidator,
     TimeOrderValidator,
+    DoctorAvailableValidator
 };

@@ -16,6 +16,8 @@ const {
 } = require('../shared/validators/booking.validator.chain');
 
 const { appointmentObserver } = require('../shared/observers/appointments.observer.js');
+const { DoctorAvailableValidator } = require('../shared/validators/availability.validators.js');
+
 
 const router = express.Router();
 
@@ -30,7 +32,8 @@ router.post('/book', authenticate, requireRole('PATIENT'), async (req, res) => {
     const head = new Validator();
     head
       .setNext(new StartRequiredValidator())
-      .setNext(new NoPastStartValidator());
+      .setNext(new NoPastStartValidator())
+      .setNext(new DoctorAvailableValidator());
 
     await head.handle({ body: req.body, user: req.user });
 

@@ -19,6 +19,8 @@ app.use('/api/patient', require('./routes/patient.routes'));
 app.use('/api/notifications', require('./routes/notification.routes')); //--added
 app.use('/api/history', require('./routes/history.routes')); //--added
 app.use('/api/doctor', require('./routes/doctor.availability.routes'));
+app.use('/api/doctor', require('./routes/doctor.appointments.routes'));
+app.use('/api/doctor', require('./routes/doctor.records.routes'));
 
 
 app.use('/api/test', require('./routes/test.routes'));

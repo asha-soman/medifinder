@@ -4,6 +4,7 @@ import { AuthProvider } from "./context/AuthContext";
 import RequireAuth from "./components/RequireAuth";
 import AppLayout from "./layouts/AppLayout";
 import PatientLayout from "./layouts/PatientLayout";
+import DoctorLayout from "./layouts/DoctorLayout";
 
 
 
@@ -27,6 +28,8 @@ import MyAppointments from "./pages/MyAppointments";
 
 // doctor availability pages
 import DoctorAvailability from "./pages/DoctorAvailability";
+import DoctorAppointments from "./pages/DoctorAppointments";
+
 
 export default function App() {
   return (
@@ -72,13 +75,18 @@ export default function App() {
             <Route path="/patient/notifications" element={<Notification />} />
           </Route>
           <Route
-            path="/doctor/availability"
             element={
               <RequireAuth role="doctor">
-                <DoctorAvailability />
+                <DoctorLayout />
               </RequireAuth>
             }
-          />
+          >
+            <Route path="/doctor/appointments" element={<DoctorAppointments />} />
+            <Route path="/doctor/availability" element={<DoctorAvailability />} />
+            <Route path="/doctor/history" element={<History />} />
+            <Route path="/doctor/profile" element={<DoctorProfile />} />
+          </Route>
+
         </Routes>
       </BrowserRouter>
     </AuthProvider>
