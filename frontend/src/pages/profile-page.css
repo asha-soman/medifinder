@@ -1,6 +1,5 @@
 .profile-shell{
   min-height:100vh;
-  background:linear-gradient(180deg, #eef5fb 0%, #eaf7f2 46%, #f8fbff 100%);
 }
 
 .profile-container{ 
@@ -15,7 +14,7 @@
 .profile-header{
   padding:1.1rem 0;
   border:0;
-  background:linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,.35));
+  background:linear-gradient(180deg, rgba(251, 251, 251, 0.514), rgba(231, 242, 242, 0.35));
 }
 
 .profile-header .header-layout{
