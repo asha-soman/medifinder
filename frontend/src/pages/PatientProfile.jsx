@@ -146,7 +146,7 @@ export default function PatientProfile() {
       <header className="profile-header" role="banner">
         <div className="container profile-container header-layout">
           <div className="header-left">
-            <h2 className="page-title">My Profile</h2>
+            <h2 className="profile-title">My Profile</h2>
             <p className="subtle mb-0">
               Update your details and contact so clinics can reach you.
             </p>
@@ -160,7 +160,7 @@ export default function PatientProfile() {
             {!editing ? (
               <button
                 type="button"
-                className="btn btn-outline-primary"
+                className="btn back-button"
                 onClick={startEdit}
               >
                 <i className="bi bi-pencil-square me-1" /> Edit
@@ -169,7 +169,7 @@ export default function PatientProfile() {
               <>
                 <button
                   type="button"
-                  className="btn btn-success"
+                  className="btn btn-save btn-success"
                   onClick={save}
                   disabled={saving || !isDirty}
                   aria-disabled={saving || !isDirty}
@@ -188,7 +188,7 @@ export default function PatientProfile() {
                 </button>
                 <button
                   type="button"
-                  className="btn btn-secondary"
+                  className="btn btn-cancel-style"
                   onClick={cancelEdit}
                   disabled={saving}
                 >
@@ -229,14 +229,14 @@ export default function PatientProfile() {
                       <div className="profile" aria-hidden="true">{initials.toUpperCase()}</div>
                     </div>
                     <div>
-                      <div className="h5 mb-1">{user?.name.toUpperCase() || "Patient"}</div>
+                      <div className="h5 text-light mb-1">{user?.name.toUpperCase() || "Patient"}</div>
                     </div>
                   </div>
 
                   <ul className="list-unstyled info-list mb-0">
-                    <li><span>Email:</span><strong>{user?.email || "—"}</strong></li>
-                    <li><span>Phone:</span><strong>{form.contact || "—"}</strong></li>
-                    <li><span>Date of Birth:</span><strong>{form.dateOfBirth || "—"}</strong></li>
+                    <li><span class="bold text-light">Email:</span><strong>{user?.email || "—"}</strong></li>
+                    <li><span class="text-light">Phone:</span><strong>{form.contact || "—"}</strong></li>
+                    <li><span class="text-light">Date of Birth:</span><strong>{form.dateOfBirth || "—"}</strong></li>
                   </ul>
                 </>
               )}

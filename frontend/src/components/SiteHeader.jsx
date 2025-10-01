@@ -3,14 +3,24 @@ import { useAuth } from "../context/AuthContext";
 import "./site-header.css";
 
 export default function SiteHeader() {
-  const { logout, isAuthed } = useAuth();
+  const { logout, isAuthed, user } = useAuth() || {};
   const navigate = useNavigate();
 
   const authed = isAuthed ?? !!localStorage.getItem("token");
 
+  // Robust role detection (prefer context, fall back to localStorage if you store it)
+  let role = user?.role;
+  if (!role) {
+    try {
+      const storedUser = JSON.parse(localStorage.getItem("user") || "null");
+      role = storedUser?.role;
+    } catch { }
+  }
+  const isPatient = authed && role === "patient";
+
   const handleLogout = () => {
     logout?.();
-    navigate("/login", { replace: true });
+    navigate("/", { replace: true });
   };
 
   return (
@@ -36,6 +46,30 @@ export default function SiteHeader() {
         </Link>
 
         <nav className="header-nav">
+          {isPatient && (
+            <div className="header-links">
+              <Link to="/patient/search" className="header-link">
+                <i class="bi bi-search-heart me-1" aria-hidden="true"></i>
+                Find a Doctor</Link>
+              <Link to="/patient/my-appointments" className="header-link">
+                <i className="bi bi-calendar-check me-1" aria-hidden="true"></i>
+                My Appointments
+              </Link>
+              <Link to="/patient/history" className="header-link">
+                <i className="bi bi-clock-history me-1" aria-hidden="true"></i>
+                History
+              </Link>
+              <Link to="/patient/notifications" className="header-link">
+                <i class="bi bi-bell-fill me-1" aria-hidden="true"></i>
+                Notification</Link>
+              <Link to="/patient/profile" className="header-link">
+                <i className="bi bi-person-circle me-1" aria-hidden="true"></i>
+                Profile
+              </Link>
+
+            </div>
+          )}
+
           {authed ? (
             <button
               onClick={handleLogout}

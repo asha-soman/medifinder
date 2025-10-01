@@ -1,11 +1,11 @@
 import { Outlet } from "react-router-dom";
-import Navbar from "../components/NavbarPatient";
 import Footer from "../components/SiteFooter";
+import SiteHeader from "../components/SiteHeader";
 
 export default function PatientLayout() {
   return (
     <>
-      <Navbar />
+      <SiteHeader />
       <Outlet />
       <Footer />
     </>
