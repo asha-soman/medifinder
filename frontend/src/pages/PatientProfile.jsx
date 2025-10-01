@@ -146,7 +146,7 @@ export default function PatientProfile() {
       <header className="profile-header" role="banner">
         <div className="container profile-container header-layout">
           <div className="header-left">
-            <h2 className="page-title">My Profile</h2>
+            <h2 className="profile-title">My Profile</h2>
             <p className="subtle mb-0">
               Update your details and contact so clinics can reach you.
             </p>
@@ -160,7 +160,7 @@ export default function PatientProfile() {
             {!editing ? (
               <button
                 type="button"
-                className="btn btn-outline-primary"
+                className="btn back-button"
                 onClick={startEdit}
               >
                 <i className="bi bi-pencil-square me-1" /> Edit

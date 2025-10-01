@@ -25,12 +25,12 @@
 
 .back-button{
   color:white;
-  background-color: #098ad0;
+  background-color: #065179;
   font-weight: 900px;
 }
 
 .back-button:hover{
-  background-color: #1582bd;
+  background-color: #06759e;
   color: white;
 }
 
@@ -44,10 +44,10 @@
   align-items:center; 
 }
 
-.page-title{ 
-  font-weight:500; 
+.profile-title{ 
+  font-weight:700; 
   letter-spacing:.2px; 
-  color:rgb(6, 69, 92); 
+  color:rgb(11, 121, 161); 
 }
 
 .subtle{

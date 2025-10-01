@@ -181,11 +181,11 @@ export default function MyAppointments() {
                     </div>
                   </td>
                   <td className="center actions">
-                    <button className="btn btn-edit" onClick={() => onEdit(a)}>
+                    <button className="btn btn-style btn-edit" onClick={() => onEdit(a)}>
                       Edit
                     </button>
                     <button
-                      className="btn btn-cancel"
+                      className="btn btn-style btn-cancel"
                       onClick={() => onCancelAppt(a._id)}
                     >
                       Cancel
