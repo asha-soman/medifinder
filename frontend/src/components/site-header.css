@@ -38,10 +38,11 @@
 }
 
 .header-link {
-  color: #eaf4ff;
+  color: #f3f5f8;
   text-decoration: none;
   font-weight: 500;
   white-space: nowrap;
+  padding-left: 25px;
 }
 
 .header-link:hover {

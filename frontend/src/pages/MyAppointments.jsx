@@ -284,11 +284,11 @@ export default function MyAppointments() {
             </div>
 
             <div className="modal-actions">
-              <button className="btn-lg btn-cancel-lg" onClick={onCancelEdit}>
+              <button className="btn-lg cancel-edit-style btn-cancel-lg" onClick={onCancelEdit}>
                 Cancel
               </button>
               <button
-                className="btn-lg btn-save"
+                className="btn-lg cancel-edit-style btn-save"
                 onClick={onSaveEdit}
                 disabled={!newDate || !newTimeISO}
               >

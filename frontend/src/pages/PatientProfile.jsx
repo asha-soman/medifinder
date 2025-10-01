@@ -169,7 +169,7 @@ export default function PatientProfile() {
               <>
                 <button
                   type="button"
-                  className="btn btn-success"
+                  className="btn btn-save btn-success"
                   onClick={save}
                   disabled={saving || !isDirty}
                   aria-disabled={saving || !isDirty}
@@ -188,7 +188,7 @@ export default function PatientProfile() {
                 </button>
                 <button
                   type="button"
-                  className="btn btn-secondary"
+                  className="btn btn-cancel-style"
                   onClick={cancelEdit}
                   disabled={saving}
                 >
@@ -229,14 +229,14 @@ export default function PatientProfile() {
                       <div className="profile" aria-hidden="true">{initials.toUpperCase()}</div>
                     </div>
                     <div>
-                      <div className="h5 mb-1">{user?.name.toUpperCase() || "Patient"}</div>
+                      <div className="h5 text-light mb-1">{user?.name.toUpperCase() || "Patient"}</div>
                     </div>
                   </div>
 
                   <ul className="list-unstyled info-list mb-0">
-                    <li><span>Email:</span><strong>{user?.email || "—"}</strong></li>
-                    <li><span>Phone:</span><strong>{form.contact || "—"}</strong></li>
-                    <li><span>Date of Birth:</span><strong>{form.dateOfBirth || "—"}</strong></li>
+                    <li><span class="bold text-light">Email:</span><strong>{user?.email || "—"}</strong></li>
+                    <li><span class="text-light">Phone:</span><strong>{form.contact || "—"}</strong></li>
+                    <li><span class="text-light">Date of Birth:</span><strong>{form.dateOfBirth || "—"}</strong></li>
                   </ul>
                 </>
               )}
