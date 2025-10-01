@@ -1,4 +1,3 @@
-// backend/controllers/history.controller.js
 const Appointment = require("../models/appointment.model");
 
 const listCompleted = async (req, res) => {
@@ -17,7 +16,7 @@ const listCompleted = async (req, res) => {
       .populate({ path: "patientId", select: "name email" })
       .populate({ path: "doctorId", select: "name email" });
 
-    res.json(appts);
+    res.json({ items: appts });   // ✅ wrap result in { items: ... }
   } catch (err) {
     console.error("History fetch error:", err);
     res.status(500).json({ message: err.message });
