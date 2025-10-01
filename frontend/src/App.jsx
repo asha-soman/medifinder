@@ -8,8 +8,6 @@ import PatientLayout from "./layouts/PatientLayout";
 // public pages and dashboard (did not change anything with the logic)
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import PatientDashboard from "./pages/PatientDashboard";
-import DoctorDashboard from "./pages/DoctorDashboard";
 import Landing from "./pages/Landing";
 import DoctorProfile from "./pages/DoctorProfile";
 import PatientProfile from "./pages/PatientProfile";
@@ -29,23 +27,7 @@ export default function App() {
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-
-            <Route path="/patient/dashboard"
-              element={
-                <RequireAuth role="patient">
-                  <PatientDashboard />
-                </RequireAuth>
-              }
-            />
             <Route
-              path="/doctor/dashboard"
-              element={
-                <RequireAuth role="doctor">
-                  <DoctorDashboard />
-                </RequireAuth>
-              }
-            />
-             <Route
               path="/doctor/profile"
               element={
                 <RequireAuth role="doctor">
@@ -61,7 +43,6 @@ export default function App() {
                 </RequireAuth>
               }
             />
-
             <Route path="*" element={<Login />} />
           </Route>
 
