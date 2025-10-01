@@ -43,7 +43,7 @@ export default function BookAppointment() {
           Missing booking details. Please go back and choose a doctor & time.
         </div>
         <div className="actions">
-          <button className="btn btn-cancel" onClick={() => navigate(-1)}>Back</button>
+          <button className="btn appointment-button btn-cancel" onClick={() => navigate(-1)}>Back</button>
         </div>
       </div>
     );
@@ -162,8 +162,8 @@ export default function BookAppointment() {
 
       {/* Actions */}
       <div className="actions">
-        <button className="btn btn-cancel" onClick={() => navigate(-1)}>Cancel</button>
-        <button className="btn btn-primary" onClick={onSubmit} disabled={submitting}>
+        <button className="btn appointment-button btn-cancel" onClick={() => navigate(-1)}>Cancel</button>
+        <button className="btn appointment-button btn-primary" onClick={onSubmit} disabled={submitting}>
           {submitting ? "Booking…" : "Book"}
         </button>
       </div>
