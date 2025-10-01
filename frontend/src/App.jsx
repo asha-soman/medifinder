@@ -24,6 +24,10 @@ import SearchDoctor from "./pages/SearchDoctor";
 import BookAppointment from "./pages/BookAppointment";
 import MyAppointments from "./pages/MyAppointments";
 
+
+// doctor availability pages
+import DoctorAvailability from "./pages/DoctorAvailability";
+
 export default function App() {
   return (
     <AuthProvider>
@@ -67,6 +71,14 @@ export default function App() {
             <Route path="/patient/history" element={<History />} />
             <Route path="/patient/notifications" element={<Notification />} />
           </Route>
+          <Route
+            path="/doctor/availability"
+            element={
+              <RequireAuth role="doctor">
+                <DoctorAvailability />
+              </RequireAuth>
+            }
+          />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
