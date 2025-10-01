@@ -30,6 +30,25 @@
   color: #3de567;
 }
 
+.header-links {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-right: 12px; 
+}
+
+.header-link {
+  color: #eaf4ff;
+  text-decoration: none;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.header-link:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
 .header-logo {
   width: 32px;    
   height: 32px;

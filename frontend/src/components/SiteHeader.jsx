@@ -3,10 +3,20 @@ import { useAuth } from "../context/AuthContext";
 import "./site-header.css";
 
 export default function SiteHeader() {
-  const { logout, isAuthed } = useAuth();
+  const { logout, isAuthed, user } = useAuth() || {};
   const navigate = useNavigate();
 
   const authed = isAuthed ?? !!localStorage.getItem("token");
+
+  // Robust role detection (prefer context, fall back to localStorage if you store it)
+  let role = user?.role;
+  if (!role) {
+    try {
+      const storedUser = JSON.parse(localStorage.getItem("user") || "null");
+      role = storedUser?.role;
+    } catch {/* ignore */}
+  }
+  const isPatient = authed && role === "patient";
 
   const handleLogout = () => {
     logout?.();
@@ -30,12 +40,22 @@ export default function SiteHeader() {
             </svg>
           </span>
 
-          <span className="header-brand-text">
+        <span className="header-brand-text">
             <span className="header-brand-medi">Medi</span>Finder
           </span>
         </Link>
 
         <nav className="header-nav">
+          {isPatient && (
+            <div className="header-links">
+              <Link to="/patient/search" className="header-link">Find a Doctor</Link>
+              <Link to="/patient/my-appointments" className="header-link">My Appointments</Link>
+              <Link to="/patient/history" className="header-link">History</Link>
+              <Link to="/patient/notifications" className="header-link">Notification</Link>
+              <Link to="/patient/profile" className="header-link">Profile</Link>
+            </div>
+          )}
+
           {authed ? (
             <button
               onClick={handleLogout}
