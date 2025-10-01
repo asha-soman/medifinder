@@ -153,7 +153,7 @@ export default function PatientProfile() {
           </div>
 
           <div className="header-actions">
-            <Link to="/patient/dashboard" className="btn back-button">
+            <Link to="/patient/search" className="btn back-button">
               <i className="bi bi-arrow-left-short me-1" /> Back to Dashboard
             </Link>
 
