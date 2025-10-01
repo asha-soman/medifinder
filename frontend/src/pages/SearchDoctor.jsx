@@ -9,8 +9,9 @@ const normalizeDoctorsResponse = (data) => {
   const list = Array.isArray(data?.items) ? data.items : Array.isArray(data) ? data : [];
   return list.map((d) => ({
     doctorId: d.doctorId || d._id,
-    doctorName: d.doctorName,
-    specialty: d.specialty,
+    doctorName: d.doctorName, // backend already sends a displayable name
+    // backend uses "specialization"; keep exposing it to the UI as "specialty", I don't need to redo all
+    specialty: d.specialization ?? d.specialty ?? "",
     slots: (d.availableSlots || d.slots || []).map((s) =>
       typeof s === "string" ? s : (s.start || "")
     ),
@@ -42,6 +43,7 @@ const findNextAvailableDate = async ({ name, specialty, startDate }) => {
     const dateStr = addDays(startDate, i);
     const data = await searchDoctors({
       name: name?.trim() || undefined,
+      // bookingApi maps `specialty` while backend's `specialization`
       specialty: normalizedSpec,
       date: dateStr,
       page: 1,
@@ -99,9 +101,11 @@ export default function SearchDoctor() {
         // fallback: derive from doctors list
         const data = await searchDoctors({ page: 1, limit: 1000 });
         const items = Array.isArray(data?.items) ? data.items : Array.isArray(data) ? data : [];
-        const uniqueFromSearch = Array.from(new Set(items.map((d) => d.specialty)))
-          .filter(Boolean)
-          .sort();
+        const uniqueFromSearch = Array.from(
+          new Set(
+            items.map((d) => d.specialization ?? d.specialty).filter(Boolean)
+          )
+        ).sort();
         setSpecialties(uniqueFromSearch);
       } catch {
         setSpecialties([]);
@@ -139,7 +143,7 @@ export default function SearchDoctor() {
       const normalizedSpec = specialty && specialty !== "All" ? specialty : undefined;
       const data = await searchDoctors({
         name: name.trim() || undefined,
-        specialty: normalizedSpec,
+        specialty: normalizedSpec, // mapped in bookingApi
         date: effectiveDate,
         page: targetPage,
         limit: 5,
@@ -164,7 +168,7 @@ export default function SearchDoctor() {
       const normalizedSpec = specialty && specialty !== "All" ? specialty : undefined;
       const data = await searchDoctors({
         name: name.trim() || undefined,
-        specialty: normalizedSpec,
+        specialty: normalizedSpec, // mapped in bookingApi
         date: effectiveDate,
         page: 1,
         limit: 5,
@@ -400,4 +404,3 @@ export default function SearchDoctor() {
     </div>
   );
 }
-//sample
