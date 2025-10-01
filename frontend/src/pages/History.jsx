@@ -25,7 +25,7 @@ export default function History() {
     (async () => {
       setLoading(true); setErr("");
       try {
-        const res = await api.get("/api/history");
+        const res = await api.get("/history");
         const list = Array.isArray(res.data?.items) ? res.data.items : [];
         if (mounted) setRows(list);
       } catch (e) {
