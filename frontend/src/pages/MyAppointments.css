@@ -118,3 +118,22 @@
 .btn-save { background:#1B3951; color:#fff; border:1px solid transparent; }
 
 .muted { color:#6B7280; }
+
+/* Center the buttons */
+.myappts-table tbody td.actions {
+  display: flex;        
+  justify-content: center;
+  align-items: center;        
+  gap: 10px;
+  padding: 0 12px;
+  height: 64px;
+}
+
+/* button is centered */
+.btn-style {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
