@@ -1,7 +1,7 @@
-const EventEmitter  = require("events");
-const Notification  = require("../../models/notification.model");
-const Patient       = require("../../models/patient.model");
-const Doctor        = require("../../models/doctor.model");
+const EventEmitter = require("events");
+const Notification = require("../../models/notification.model");
+const Patient = require("../../models/patientProfile.model");
+const Doctor = require("../../models/doctorProfile.model");
 
 const bus = new EventEmitter();
 console.log("[bus] event bus loaded");
