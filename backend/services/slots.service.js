@@ -147,6 +147,8 @@ async function findSlots({ date, specialization, name, page = 1, limit = 5 }) {
       startTime: { $lt: endOfDay },
       endTime:   { $gt: startOfDay },
     })
+
+
       .select('doctorUserId startTime endTime')
       .sort({ doctorUserId: 1, startTime: 1 })
       .lean(),
