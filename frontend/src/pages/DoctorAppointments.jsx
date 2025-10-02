@@ -10,14 +10,13 @@ export default function DoctorAppointments() {
     const [recordForm, setRecordForm] = useState({ medicalSummary: "", prescriptionUrl: "" });
     const [err, setErr] = useState("");
 
-    useEffect(() => { load(); setSelected(null); }, [date]);
-
     const load = useCallback(async () => {
         const data = await getDoctorAppointments(date);
         setAppointments(data);
     }, [date]);
 
     useEffect(() => {
+        setSelected(null);
         load();
     }, [load]);
 
