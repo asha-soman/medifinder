@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate, Link } from "react-router-dom";
-import "./auth-hero.css"; 
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import "./auth-hero.css";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const loc = useLocation();
+  const [email, setEmail] = useState(loc.state?.email || "");
   const [password, setPassword] = useState("");
+  const [showPwd, setShowPwd] = useState(false);
   const [err, setErr] = useState("");
   const { login } = useAuth();
   const nav = useNavigate();
@@ -15,48 +17,70 @@ export default function Login() {
     setErr("");
     try {
       const u = await login(email, password);
-      nav(u.role === "doctor" ? "/doctor/dashboard" : "/patient/dashboard", { replace: true });
+      nav(u.role === "doctor" ? "/doctor/dashboard" : "/patient/search", {
+        replace: true,
+      });
     } catch (e) {
       setErr(e.message || "Login failed");
     }
   }
 
   return (
-    <>
-      <section
-        className="mf-hero"
-      >
-        <div className="mf-hero__overlay">
-          <form className="mf-card" onSubmit={onSubmit}>
-            <h1 className="mf-card__title">Login</h1>
+    <section className="auth-hero">
+      <div className="auth-hero-center">
+        <form className="auth-card" onSubmit={onSubmit}>
+          <h1 className="auth-card-title">
+            <span className="auth-accent">Log</span>in
+          </h1>
 
-            {err && <div className="mf-error">{err}</div>}
+          {err && (
+            <div className="auth-error" role="alert">
+              {err}
+            </div>
+          )}
 
+          <label className="auth-label" htmlFor="login-email">Email</label>
+          <input
+            id="login-email"
+            className="auth-input"
+            type="email"
+            placeholder="Email Id"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoComplete="email"
+          />
+
+          <label className="auth-label" htmlFor="login-password">Password</label>
+          <div className="input-group input-group-lg">
             <input
-              className="mf-input"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <input
-              className="mf-input"
-              type="password"
-              placeholder="••••••••"
+              id="login-password"
+              className="form-control"
+              type={showPwd ? "text" : "password"}
+              placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              autoComplete="current-password"
             />
+            <button
+              type="button"
+              className="btn btn-light btn-eye"
+              onClick={() => setShowPwd((s) => !s)}
+              aria-label={showPwd ? "Hide password" : "Show password"}
+              tabIndex={0}
+            >
+              <i className={`bi ${showPwd ? "bi-eye-slash" : "bi-eye"}`} />
+            </button>
+          </div>
 
-            <button className="mf-cta" type="submit">Login</button>
+          <button className="auth-cta" type="submit">Login</button>
 
-            <p className="mf-help">
-              New here? <Link to="/signup">Create an account</Link>
-            </p>
-          </form>
-        </div>
-      </section>
-    </>
+          <p className="auth-help">
+            New here? <Link to="/signup">Create an account</Link>
+          </p>
+        </form>
+      </div>
+    </section>
   );
 }

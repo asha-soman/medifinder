@@ -5,11 +5,19 @@ import RequireAuth from "./components/RequireAuth";
 import AppLayout from "./layouts/AppLayout";
 import PatientLayout from "./layouts/PatientLayout";
 
+
+
 // public pages and dashboard (did not change anything with the logic)
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import PatientDashboard from "./pages/PatientDashboard";
-import DoctorDashboard from "./pages/DoctorDashboard";
+import Landing from "./pages/Landing";
+import DoctorProfile from "./pages/DoctorProfile";
+import PatientProfile from "./pages/PatientProfile";
+import History from "./pages/History";
+import Notification from "./pages/Notification";
+
+
+
 
 // patient booking pages
 import SearchDoctor from "./pages/SearchDoctor";
@@ -21,31 +29,26 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/** Asha's Logic, did not change anything on the logic */}
           <Route element={<AppLayout />}>
-            {/* Public pages */}
+            <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-
-            {/* Dashboards */}
             <Route
-              path="/patient/dashboard"
-              element={
-                <RequireAuth role="patient">
-                  <PatientDashboard />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/doctor/dashboard"
+              path="/doctor/profile"
               element={
                 <RequireAuth role="doctor">
-                  <DoctorDashboard />
+                  <DoctorProfile />
                 </RequireAuth>
               }
             />
-
-            {/* Default route if nothing matches */}
+            <Route
+              path="/patient/profile"
+              element={
+                <RequireAuth role="patient">
+                  <PatientProfile />
+                </RequireAuth>
+              }
+            />
             <Route path="*" element={<Login />} />
           </Route>
 
@@ -61,6 +64,8 @@ export default function App() {
             <Route path="/patient/search" element={<SearchDoctor />} />
             <Route path="/patient/book" element={<BookAppointment />} />
             <Route path="/patient/my-appointments" element={<MyAppointments />} />
+            <Route path="/patient/history" element={<History />} />
+            <Route path="/patient/notifications" element={<Notification />} />
           </Route>
         </Routes>
       </BrowserRouter>
