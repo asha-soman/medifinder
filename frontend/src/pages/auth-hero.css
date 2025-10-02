@@ -1,87 +1,133 @@
-.mf-hero{
-  background: center/cover no-repeat url("../assets/hero.jpg");
-  min-height: calc(100vh - 56px);
-  display:grid; 
-  place-items:center;
+.auth-hero {
+  min-height: 100vh;
+  position: relative;
+  background: center/cover no-repeat url("../assets/loginSignup.jpg");
 }
 
-.mf-hero__overlay{
-  width:100%;
-   max-width:980px; 
-  margin:0 auto; 
-  padding:40px 16px;
-  display:grid; 
-  place-items:center;
+.auth-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.78); 
+  pointer-events: none;
 }
 
-.mf-card{
-  width:min(540px, 100%);
-  background: rgba(13, 31, 54, .82);       
-  border: 1px solid rgba(255,255,255,.08);
-  backdrop-filter: blur(4px);
-  border-radius: 14px;
-  padding: 28px;
-  display:grid; 
-  gap:14px;
+.auth-hero-center {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
 }
 
-.mf-card__title{
-  margin: 4px 0 8px 0;
-  text-align:center;
-  color:#7cc04b; 
-  font-size:28px; 
-  font-weight:800;
+.auth-card {
+  width: min(640px, 92vw);
+  background: rgb(85, 118, 149);
+  color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+  padding: 28px 28px 24px;
 }
 
-.mf-input{
-  width:100%; padding:12px 14px; 
-  border-radius:10px;
-  border: 1px solid rgba(255,255,255,.15);
-  background: rgba(255,255,255,.92); 
-  color:#0a1b2c;
-  outline:none; 
-  font-size:15px;
-}
-.mf-input:focus{ 
-  box-shadow: 0 0 0 3px rgba(124,192,75,.25) 
+.auth-card-title {
+  text-align: center;
+  margin: 4px 0 18px;
+  font-weight: 700;
+  letter-spacing: .3px;
 }
 
-.mf-cta{
-  margin-top:6px;
-  width:100%; 
-  padding:12px 14px;
-  border:0; 
-  border-radius:10px;
-  background:#7cc04b; 
-  color:#0a1b2c; 
-  font-weight:800; 
-  font-size:16px;
-  cursor:pointer; 
-  box-shadow: 0 12px 24px rgba(124,192,75,.25);
-}
-.mf-cta:hover{ 
-  filter:brightness(1.03) 
+.auth-accent { 
+  color: #11ec48; 
 }
 
-.mf-help{
-  margin:4px 0 0; 
-  text-align:center; 
-  color:#d7e2ee; 
-  font-size:13px;
-}
-.mf-help a{ 
-  color:#a8e06f; 
-  text-decoration:none 
-}
-.mf-help a:hover{ 
-  text-decoration:underline 
+.auth-label {
+  display: block;
+  margin: 10px 2px 6px;
+  font-size: 0.95rem;
+  opacity: 0.9;
 }
 
-.mf-error{
-  background: rgba(239,71,111,.12);
-  color:#ffd8e1; 
-  border:1px solid rgba(239,71,111,.35);
-  padding:10px 12px; 
-  border-radius:10px; 
-  font-size:13px;
+/* Inputs */
+.auth-input {
+  width: 100%;
+  height: 52px;
+  border-radius: 12px;
+  border: 3px solid rgba(135, 133, 133, 0.25);
+  background: rgba(255,255,255,0.96);
+  padding: 0 14px;
+  font-size: 1rem;
+  outline: none;
+  margin-bottom: 14px;
+}
+
+.auth-card .input-group {
+  margin-bottom: 16px;
+}
+
+@media (min-width: 992px) {
+  .auth-card .input-group { margin-bottom: 20px; }
+}
+
+.input-group-lg > .btn { border-radius: 0 12px 12px 0; }
+.input-group-lg > .form-control { border-radius: 12px 0 0 12px; }
+
+.auth-cta {
+  width: 100%;
+  height: 52px;
+  border: none;
+  border-radius: 12px;
+  background-color: #23a844;
+  border: 3px solid rgba(135, 133, 133, 0.25);
+  color: #fff;
+  font-weight: 500;
+  letter-spacing: .4px;
+  font-size: 20px;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.auth-cta:hover { 
+  filter: brightness(0.98); 
+}
+
+.auth-error {
+  background: rgba(238, 65, 65, 0.648);
+  border: 1px solid rgba(246, 47, 47, 0.729);
+  color: white;
+  font-weight: 200px;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.auth-help {
+  text-align: center;
+  margin: 12px 0 0;
+  opacity: 1.95;
+}
+
+/* auth-hero.css */
+.btn-eye {
+  background: #fff;
+  border: 2px solid #adc4df;
+  border-color: #adc4df;
+}
+.btn-eye:hover { background: #e9e7e7; }
+
+
+.auth-help a {
+  color: #34fa69;
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.auth-help a:hover { 
+  text-decoration: underline; 
+}
+
+@media (max-width: 420px) {
+  .auth-card { padding: 22px 16px 18px; }
+  .auth-input, .auth-cta { height: 48px; }
 }

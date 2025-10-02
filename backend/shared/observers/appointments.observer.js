@@ -1,3 +1,7 @@
+//for our report:
+//This is a simple broadcast system.
+//Notify when appointment was booked/updated/canceled.
+
 const EventEmitter = require('events');
 
 class AppointmentObserver extends EventEmitter {}

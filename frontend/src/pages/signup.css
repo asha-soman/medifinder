@@ -1,0 +1,49 @@
+.signup-hero{
+  min-height: 100vh;
+  background: center/cover no-repeat url("../assets/hero.jpg");
+  position: relative;
+  overflow: hidden;       
+}
+
+.signup-card{
+  border-radius: 20px;
+  background: rgba(25, 58, 89, 0.78);
+  color: #fff;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.35); 
+}
+
+.signup-card .card-header h1{
+  color: #dfeaf1;
+  letter-spacing: .3px;
+}
+
+.signup-card .form-control,
+.signup-card .form-select{
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.95);
+}
+
+.signup-card .form-control:focus,
+.signup-card .form-select:focus{
+  box-shadow: 0 0 0 .25rem rgba(58,166,85,.25);
+  border-color: #3aa655;
+}
+
+.signup-cta{
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(58,166,85,.35);
+}
+
+.signup-card .card-header{
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+
+.input-group-lg>.btn{
+  border-radius: 0 12px 12px 0;
+}
+.input-group-lg>.form-control{
+  border-radius: 12px 0 0 12px;
+}

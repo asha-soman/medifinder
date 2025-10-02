@@ -2,17 +2,35 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-/* ---- tiny helpers ---- */
+/* =========================
+   AXIOS CLIENT + TOKEN
+   ========================= */
+const api = axios.create({
+  baseURL: "http://localhost:5001/api", // your local backend
+  withCredentials: false,               // header-based auth (not cookies)
+});
+
 function getToken() {
-  // try common keys your app might use
+  // Try common keys; adjust if your login uses another one
   return (
     localStorage.getItem("token") ||
     localStorage.getItem("authToken") ||
-    localStorage.getItem("accessToken") ||
+    localStorage.getItem("jwt") ||
     ""
   );
 }
 
+// Attach token to every request and log a preview for debugging
+api.interceptors.request.use((config) => {
+  const t = getToken();
+  console.log("🔐 JWT (first 24 chars):", t ? t.slice(0, 24) + "..." : "(none)");
+  if (t) config.headers.Authorization = `Bearer ${t}`;
+  return config;
+});
+
+/* =========================
+   UTIL HELPERS
+   ========================= */
 function formatDateTime(iso) {
   try {
     const d = new Date(iso);
@@ -45,6 +63,9 @@ function BellIcon({ muted = false }) {
   );
 }
 
+/* =========================
+   PAGE COMPONENT
+   ========================= */
 export default function Notification() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,25 +74,14 @@ export default function Notification() {
   useEffect(() => {
     let mounted = true;
 
-    async function load() {
+    (async function load() {
       setLoading(true);
       setErr("");
 
       try {
-        // Axios client that sends the JWT
-        const api = axios.create({
-          baseURL: "/api",
-          // If your backend uses httpOnly cookie instead of header, remove headers
-          // and set withCredentials: true (and ensure CORS credentials on server).
-          headers: (() => {
-            const t = getToken();
-            return t ? { Authorization: `Bearer ${t}` } : {};
-          })(),
-          withCredentials: true, // safe to leave on; ignored if not needed
-        });
-
+        // Backend route mounted at app.use("/api/notifications", ...)
         const res = await api.get("/notifications");
-        // backend might return an array or { items: [...] }
+
         const rows = Array.isArray(res.data)
           ? res.data
           : Array.isArray(res.data?.items)
@@ -81,18 +91,29 @@ export default function Notification() {
         if (mounted) setItems(rows);
       } catch (e) {
         const status = e?.response?.status;
-        if (status === 401 || status === 403) {
-          setErr("Please sign in again.");
-        } else {
-          setErr("Could not load notifications.");
-        }
-        setItems([]); // no fallback demo rows now that auth matters
+        const msg =
+          e?.response?.data?.message ||
+          e?.response?.data?.error ||
+          e?.message ||
+          "Unknown error";
+
+        // show exact error on screen
+        setErr(`(${status || "no-status"}) ${msg}`);
+
+        // and log full context
+        console.log("Notifications error:", {
+          url: "/notifications",
+          status,
+          data: e?.response?.data,
+          headers: e?.response?.headers,
+        });
+
+        setItems([]);
       } finally {
         if (mounted) setLoading(false);
       }
-    }
+    })();
 
-    load();
     return () => {
       mounted = false;
     };
@@ -128,6 +149,7 @@ export default function Notification() {
             </div>
           </article>
         ))}
+
         {!loading && items.length === 0 && !err && (
           <div style={styles.note}>No notifications yet.</div>
         )}
@@ -138,7 +160,9 @@ export default function Notification() {
   );
 }
 
-/* ---- inline styles ---- */
+/* =========================
+   STYLES
+   ========================= */
 const styles = {
   pageWrap: { maxWidth: 980, margin: "32px auto 0", padding: "0 24px" },
   h1: { fontSize: 22, fontWeight: 700, margin: "8px 0 20px" },

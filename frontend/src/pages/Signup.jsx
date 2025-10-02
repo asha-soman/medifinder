@@ -3,57 +3,105 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import "./auth-hero.css";
 
-export default function Signup(){
-  const [name,setName] = useState("");
-  const [email,setEmail] = useState("");
-  const [password,setPassword] = useState("");
-  const [role,setRole] = useState("patient");
-  const [err,setErr] = useState("");
+export default function Signup() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("patient");
+  const [err, setErr] = useState("");
+  const [showPwd, setShowPwd] = useState(false);
   const { register } = useAuth();
   const nav = useNavigate();
 
-  async function onSubmit(e){
-    e.preventDefault(); setErr("");
-    try{
-      const u = await register(name, email, role, password);
-      nav(u.role === "doctor" ? "/doctor/dashboard" : "/patient/dashboard", { replace:true });
-    }catch(e){ setErr(e.message || "Signup failed"); }
+  async function onSubmit(e) {
+    e.preventDefault();
+    setErr("");
+    try {
+      await register(name, email, role, password);
+      nav("/login", { replace: true, state: { email } });
+    } catch (e) {
+      setErr(e.message || "Signup failed");
+    }
   }
 
   return (
-    <>
-      <section className="mf-hero" role="img" aria-label="Healthcare background">
-        <div className="mf-hero__overlay">
-          <form className="mf-card" onSubmit={onSubmit}>
-            <h1 className="mf-card__title">Sign Up</h1>
+    <section className="auth-hero" aria-label="Healthcare background">
+      <div className="auth-hero-center">
+        <form className="auth-card" onSubmit={onSubmit} noValidate>
+          <h1 className="auth-card-title">
+            <span className="auth-accent">Sign</span> Up
+          </h1>
 
-            {err && <div className="mf-error">{err}</div>}
+          {err && (
+            <div className="auth-error" role="alert">
+              {err}
+            </div>
+          )}
 
+          <label className="auth-label" htmlFor="su-name">Full name</label>
+          <input
+            id="su-name"
+            className="auth-input"
+            placeholder="Full name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            autoComplete="name"
+          />
+
+          <label className="auth-label" htmlFor="su-email">Email</label>
+          <input
+            id="su-email"
+            className="auth-input"
+            type="email"
+            placeholder="Email Id"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoComplete="email"
+          />
+
+          <label className="auth-label" htmlFor="su-pass">Password</label>
+          <div className="input-group input-group-lg">
             <input
-              className="mf-input" placeholder="Full name" value={name}
-              onChange={e=>setName(e.target.value)} required
+              id="su-pass"
+              className="form-control"
+              type={showPwd ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="new-password"
             />
-            <input
-              className="mf-input" placeholder="Email" type="email" value={email}
-              onChange={e=>setEmail(e.target.value)} required
-            />
-            <input
-              className="mf-input" placeholder="Password" type="password" value={password}
-              onChange={e=>setPassword(e.target.value)} required
-            />
-            <select className="mf-input" value={role} onChange={e=>setRole(e.target.value)}>
-              <option value="patient">Patient</option>
-              <option value="doctor">Doctor</option>
-            </select>
+            <button
+              type="button"
+              className="btn btn-light btn-eye"
+              onClick={() => setShowPwd((s) => !s)}
+              aria-label={showPwd ? "Hide password" : "Show password"}
+              aria-pressed={showPwd}
+            >
+              <i className={`bi ${showPwd ? "bi-eye-slash" : "bi-eye"}`} />
+            </button>
+          </div>
 
-            <button className="mf-cta" type="submit">Create an Account</button>
+          <label className="auth-label" htmlFor="su-role">Role</label>
+          <select
+            id="su-role"
+            className="auth-input"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+          >
+            <option value="patient">Patient</option>
+            <option value="doctor">Doctor</option>
+          </select>
 
-            <p className="mf-help">
-              Already have an account? <Link to="/login">Login</Link>
-            </p>
-          </form>
-        </div>
-      </section>
-    </>
+          <button className="auth-cta" type="submit">Create an Account</button>
+
+          <p className="auth-help">
+            Already have an account? <Link to="/login">Login</Link>
+          </p>
+        </form>
+      </div>
+    </section>
   );
 }
