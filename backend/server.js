@@ -18,6 +18,7 @@ app.use('/api/doctor', require('./routes/doctor.routes'));
 app.use('/api/patient', require('./routes/patient.routes'));
 app.use('/api/notifications', require('./routes/notification.routes')); //--added
 app.use('/api/history', require('./routes/history.routes')); //--added
+app.use('/api/booking', require('./routes/appointments.routes')); //--just added
 
 app.use('/api/test', require('./routes/test.routes'));
 
@@ -26,5 +27,6 @@ if (require.main === module) {
   const PORT = process.env.PORT || 5001;
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
+
 
 module.exports = app;

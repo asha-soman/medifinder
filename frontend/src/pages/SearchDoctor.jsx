@@ -1,3 +1,4 @@
+// src/pages/SearchDoctor.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import doctorsImg from "../assets/doctors.png";
@@ -5,19 +6,6 @@ import { searchDoctors, getSpecialties } from "../api/bookingApi";
 import "./SearchDoctor.css";
 
 /* ---------- Helpers ---------- */
-const normalizeDoctorsResponse = (data) => {
-  const list = Array.isArray(data?.items) ? data.items : Array.isArray(data) ? data : [];
-  return list.map((d) => ({
-    doctorId: d.doctorId || d._id,
-    doctorName: d.doctorName, // backend already sends a displayable name
-    // backend uses "specialization"; keep exposing it to the UI as "specialty", I don't need to redo all
-    specialty: d.specialization ?? d.specialty ?? "",
-    slots: (d.availableSlots || d.slots || []).map((s) =>
-      typeof s === "string" ? s : (s.start || "")
-    ),
-  }));
-};
-
 const todayLocal = () => {
   const d = new Date();
   const y = d.getFullYear();
@@ -35,6 +23,33 @@ const addDays = (yyyyMmDd, n) => {
   return `${y}-${m}-${day}`;
 };
 
+/* mark a slot as free (filters out booked/completed/taken/unavailable) */
+const isFreeSlot = (s) => {
+  if (typeof s !== "object" || s === null) return true; // plain ISO string
+  const booked =
+    s.booked || s.isBooked || s.taken || s.unavailable || s.available === false;
+  const st = (s.status || s.state || "").toLowerCase();
+  return !booked && !/booked|taken|unavailable|completed|complete|cancel/.test(st);
+};
+
+/* normalize API search response into UI shape */
+const normalizeDoctorsResponse = (data) => {
+  const list = Array.isArray(data?.items) ? data.items : Array.isArray(data) ? data : [];
+  return list.map((d) => {
+    const raw = d.availableSlots ?? d.slots ?? [];
+    const slots = (Array.isArray(raw) ? raw : [])
+      .filter(isFreeSlot)
+      .map((s) => (typeof s === "string" ? s : (s.start || s.startTime || s.iso || "")))
+      .filter(Boolean);
+    return {
+      doctorId: d.doctorUserId || d._id,
+      doctorName: d.doctorName,
+      specialty: d.specialization ?? d.specialty ?? "",
+      slots,
+    };
+  });
+};
+
 // find next date with available slots
 const findNextAvailableDate = async ({ name, specialty, startDate }) => {
   const normalizedSpec = specialty && specialty !== "All" ? specialty : undefined;
@@ -43,14 +58,13 @@ const findNextAvailableDate = async ({ name, specialty, startDate }) => {
     const dateStr = addDays(startDate, i);
     const data = await searchDoctors({
       name: name?.trim() || undefined,
-      // bookingApi maps `specialty` while backend's `specialization`
-      specialty: normalizedSpec,
+      specialty: normalizedSpec, // mapped in bookingApi
       date: dateStr,
       page: 1,
       limit: 5,
     });
     const list = Array.isArray(data?.items) ? data.items : Array.isArray(data) ? data : [];
-    const hasAnySlots = list.some((item) => (item.availableSlots || []).length > 0);
+    const hasAnySlots = list.some((item) => (item.availableSlots || item.slots || []).length > 0);
     if (hasAnySlots) return { dateStr, data };
   }
   return null;
@@ -58,6 +72,48 @@ const findNextAvailableDate = async ({ name, specialty, startDate }) => {
 
 const filterBySlotsIfDated = (list, hasDate) =>
   hasDate ? list.filter((d) => Array.isArray(d.slots) && d.slots.length > 0) : list;
+
+/* ----- Just-in-time slot revalidation helpers ----- */
+const findDoctorInResults = (list, doc) => {
+  const wantId = doc.doctorId || doc.doctorUserId || doc._id;
+  return (
+    list.find((d) => {
+      const id = d.doctorUserId || d.doctorId || d._id;
+      return wantId && id && String(id) === String(wantId);
+    }) ||
+    list.find((d) => {
+      const a = (d.doctorName || d.name || "").toLowerCase();
+      const b = (doc.doctorName || doc.name || "").toLowerCase();
+      return a && b && a.includes(b);
+    }) ||
+    null
+  );
+};
+
+const extractSlots = (docObj) => {
+  if (!docObj) return [];
+  const raw = docObj.availableSlots ?? docObj.slots ?? [];
+  return (Array.isArray(raw) ? raw : [])
+    .filter(isFreeSlot)
+    .map((s) => (typeof s === "string" ? s : (s?.start || s?.startTime || s?.iso)))
+  .filter(Boolean);
+};
+
+const validateSlotAvailable = async ({ doctor, slotISO, dateStr }) => {
+  const params = {
+    doctorUserId: doctor.doctorId || doctor.doctorUserId || doctor._id, // if backend supports
+    name: doctor.doctorName || doctor.name,
+    specialty: doctor.specialty || doctor.specialization,
+    date: dateStr,
+    page: 1,
+    limit: 100,
+  };
+  const data = await searchDoctors(params);
+  const list = Array.isArray(data?.items) ? data.items : Array.isArray(data) ? data : [];
+  const match = findDoctorInResults(list, doctor);
+  const slots = extractSlots(match);
+  return slots.includes(slotISO);
+};
 
 /* ---------- Component ---------- */
 export default function SearchDoctor() {
@@ -82,6 +138,9 @@ export default function SearchDoctor() {
   // single selection across ALL doctors
   const [selected, setSelected] = useState({ doctorId: null, slotISO: null });
 
+  // just-in-time check flag
+  const [checking, setChecking] = useState(false);
+
   const navigate = useNavigate();
   const effectiveDate = date || autoSelectedDate || todayLocal();
   const hasDateInEffect = !!(date || autoSelectedDate);
@@ -102,9 +161,7 @@ export default function SearchDoctor() {
         const data = await searchDoctors({ page: 1, limit: 1000 });
         const items = Array.isArray(data?.items) ? data.items : Array.isArray(data) ? data : [];
         const uniqueFromSearch = Array.from(
-          new Set(
-            items.map((d) => d.specialization ?? d.specialty).filter(Boolean)
-          )
+          new Set(items.map((d) => d.specialization ?? d.specialty).filter(Boolean))
         ).sort();
         setSpecialties(uniqueFromSearch);
       } catch {
@@ -168,14 +225,14 @@ export default function SearchDoctor() {
       const normalizedSpec = specialty && specialty !== "All" ? specialty : undefined;
       const data = await searchDoctors({
         name: name.trim() || undefined,
-        specialty: normalizedSpec, // mapped in bookingApi
+        specialty: normalizedSpec,
         date: effectiveDate,
         page: 1,
         limit: 5,
       });
 
       const list = Array.isArray(data?.items) ? data.items : Array.isArray(data) ? data : [];
-      const hasAnySlots = list.some((item) => (item.availableSlots || []).length > 0);
+      const hasAnySlots = list.some((item) => (item.availableSlots || item.slots || []).length > 0);
 
       if (hasAnySlots) {
         const normalized = normalizeDoctorsResponse(data);
@@ -207,12 +264,29 @@ export default function SearchDoctor() {
 
   const chooseSlot = (doctorId, slotISO) => setSelected({ doctorId, slotISO });
 
-  const goToBook = (doctor) => {
+  const goToBook = async (doctor) => {
+    if (checking) return;
     if (selected.doctorId !== doctor.doctorId || !selected.slotISO) {
       alert("Please select a time slot first.");
       return;
     }
-    navigate("/patient/book", { state: { doctor, slotISO: selected.slotISO } });
+    try {
+      setChecking(true);
+      // revalidate availability just-in-time
+      const ok = await validateSlotAvailable({
+        doctor,
+        slotISO: selected.slotISO,
+        dateStr: effectiveDate,
+      });
+      if (!ok) {
+        alert("That time was just taken. Refreshing availability…");
+        await fetchPage(page);
+        return;
+      }
+      navigate("/patient/book", { state: { doctor, slotISO: selected.slotISO } });
+    } finally {
+      setChecking(false);
+    }
   };
 
   /* Pagination  */
@@ -276,7 +350,7 @@ export default function SearchDoctor() {
             aria-label="Doctor name"
           />
 
-          {/* Specialty with placeholder + All */}
+          {/* Specialty */}
           <select
             className="search-card__input"
             value={specialty}
@@ -297,7 +371,7 @@ export default function SearchDoctor() {
               ))}
           </select>
 
-          {/* Date with placeholder using text->date trick */}
+          {/* Date */}
           <input
             type={date ? "date" : "text"}
             className="search-card__input"
@@ -337,6 +411,12 @@ export default function SearchDoctor() {
       <section className="results">
         {results.map((doc) => {
           const active = selected.doctorId === doc.doctorId && !!selected.slotISO;
+
+          // Hide past times if viewing today
+          const slotsForDisplay = (doc.slots || []).filter((s) =>
+            effectiveDate === todayLocal() ? new Date(s).getTime() > Date.now() : true
+          );
+
           return (
             <div key={doc.doctorId} className="result-card">
               <div className="left-stack">
@@ -346,8 +426,8 @@ export default function SearchDoctor() {
                 </div>
                 <div className="slot-wrap">
                   {(date || autoSelectedDate) ? (
-                    doc.slots?.length ? (
-                      doc.slots.map((s) => (
+                    slotsForDisplay.length ? (
+                      slotsForDisplay.map((s) => (
                         <button
                           key={s}
                           onClick={() => chooseSlot(doc.doctorId, s)}
@@ -367,7 +447,9 @@ export default function SearchDoctor() {
               </div>
 
               <div className="book-col">
-                <button className="btn-book" onClick={() => goToBook(doc)}>Book</button>
+                <button className="btn-book" onClick={() => goToBook(doc)} disabled={checking}>
+                  {checking ? "Checking…" : "Book"}
+                </button>
               </div>
             </div>
           );
