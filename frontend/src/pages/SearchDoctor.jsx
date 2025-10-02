@@ -144,7 +144,6 @@ export default function SearchDoctor() {
   const navigate = useNavigate();
   const effectiveDate = date || autoSelectedDate || todayLocal();
   const hasDateInEffect = !!(date || autoSelectedDate);
-  const dayIsToday = effectiveDate === todayLocal();
 
   /* Load specialties once */
   useEffect(() => {
