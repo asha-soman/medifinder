@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { getDoctorAppointments, updateAppointmentStatus } from "../api/doctorAppointments";
 import { getRecordByAppointment, saveMedicalRecord } from "../api/doctorRecords";
 
@@ -10,16 +10,15 @@ export default function DoctorAppointments() {
     const [recordForm, setRecordForm] = useState({ medicalSummary: "", prescriptionUrl: "" });
     const [err, setErr] = useState("");
 
-    useEffect(() => { load(); setSelected(null); }, [date]);
+    const load = useCallback(async () => {
+        const data = await getDoctorAppointments(date);
+        setAppointments(data);
+    }, [date]);
 
-    async function load() {
-        try {
-            const data = await getDoctorAppointments(date);
-            setAppointments(data);
-        } catch (e) {
-            console.error(e);
-        }
-    }
+    useEffect(() => {
+        setSelected(null);
+        load();
+    }, [load]);
 
     async function handleStatus(id, status) {
         try {

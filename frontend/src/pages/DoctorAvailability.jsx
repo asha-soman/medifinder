@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 import {
     fetchAvailability,
@@ -54,9 +54,10 @@ export default function DoctorAvailability() {
     const [editEnd, setEditEnd] = useState("");
     const [editBlocked, setEditBlocked] = useState(false);
 
-    async function load() {
+    const load = useCallback(async () => {
         try {
-            setErr(""); setLoading(true);
+            setErr("");
+            setLoading(true);
             const dto = await fetchAvailability(ymdToISOStartUTC(dateInput), token);
             setRows(dto?.blocks || []);
         } catch (e) {
@@ -64,8 +65,11 @@ export default function DoctorAvailability() {
         } finally {
             setLoading(false);
         }
-    }
-    useEffect(() => { load(); /* eslint-disable-next-line */ }, [dateInput]);
+    }, [dateInput, token]);
+
+    useEffect(() => {
+        load();
+    }, [load]);
 
     async function onAdd(e) {
         e.preventDefault();
