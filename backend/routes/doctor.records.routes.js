@@ -4,14 +4,10 @@ const { authenticate, requireRole } = require('../middleware/auth.middleware');
 const Appointment = require('../models/appointment.model');
 const MedicalRecord = require('../models/medicalRecord.model');
 
-/**
- * Ownership check helper
- * Ensures the appointment belongs to the logged-in doctor
- */
 async function enforceDoctorOwnsAppointment(doctorUserId, appointmentId) {
     const appt = await Appointment.findById(appointmentId).lean();
     if (!appt) throw new Error('Appointment not found');
-    if (String(appt.doctorId) !== String(doctorUserId)) {
+    if (String(appt.doctorUserId) !== String(doctorUserId)) {   // ✅ doctorUserId
         const err = new Error('Forbidden');
         err.status = 403;
         throw err;
@@ -21,7 +17,6 @@ async function enforceDoctorOwnsAppointment(doctorUserId, appointmentId) {
 
 /**
  * GET /api/doctor/records/by-appointment/:appointmentId
- * Returns the record if exists, else 404
  */
 router.get('/records/by-appointment/:appointmentId', authenticate, requireRole('doctor'), async (req, res) => {
     try {
@@ -36,8 +31,6 @@ router.get('/records/by-appointment/:appointmentId', authenticate, requireRole('
 
 /**
  * POST /api/doctor/records
- * Body: { appointmentId, medicalSummary, prescriptionUrl? }
- * Upsert: create if not exists, else update (simplest UX)
  */
 router.post('/records', authenticate, requireRole('doctor'), async (req, res) => {
     try {
@@ -48,7 +41,7 @@ router.post('/records', authenticate, requireRole('doctor'), async (req, res) =>
 
         const update = {
             doctorUserId: req.user.sub,
-            patientUserId: appt.patientId,
+            patientUserId: appt.patientUserId,
             medicalSummary: medicalSummary || '',
             prescriptionUrl: prescriptionUrl || '',
         };
