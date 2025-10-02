@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { getDoctorAppointments, updateAppointmentStatus } from "../api/doctorAppointments";
 import { getRecordByAppointment, saveMedicalRecord } from "../api/doctorRecords";
 
@@ -12,14 +12,14 @@ export default function DoctorAppointments() {
 
     useEffect(() => { load(); setSelected(null); }, [date]);
 
-    async function load() {
-        try {
-            const data = await getDoctorAppointments(date);
-            setAppointments(data);
-        } catch (e) {
-            console.error(e);
-        }
-    }
+    const load = useCallback(async () => {
+        const data = await getDoctorAppointments(date);
+        setAppointments(data);
+    }, [date]);
+
+    useEffect(() => {
+        load();
+    }, [load]);
 
     async function handleStatus(id, status) {
         try {
