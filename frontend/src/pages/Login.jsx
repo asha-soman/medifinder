@@ -17,7 +17,7 @@ export default function Login() {
     setErr("");
     try {
       const u = await login(email, password);
-      nav(u.role === "doctor" ? "/doctor/dashboard" : "/patient/search", {
+      nav(u.role === "doctor" ? "/doctor/appointments" : "/patient/search", {
         replace: true,
       });
     } catch (e) {

@@ -18,6 +18,7 @@ const {
 
 const { appointmentObserver } = require('../shared/observers/appointments.observer.js');
 
+
 const router = express.Router();
 
 /** Search doctors & availability */
@@ -31,7 +32,7 @@ router.post('/book', authenticate, requireRole('patient'), async (req, res) => {
     const head = new Validator();
     head
       .setNext(new StartRequiredValidator())
-      .setNext(new NoPastStartValidator());
+      .setNext(new NoPastStartValidator())
 
     await head.handle({ body: req.body, user: req.user });
 

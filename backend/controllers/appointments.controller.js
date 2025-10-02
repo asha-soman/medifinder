@@ -66,7 +66,9 @@ const bookAppointment = async (req, res) => {
         { start: { $lte: startDate }, end: { $gte: endDate } }
       ]
     }).lean();
-    if (doctorOverlap) return res.status(409).json({ error: 'Doctor already booked for that time' });
+    if (doctorOverlap) {
+      return res.status(409).json({ error: 'Doctor already booked for that time' });
+    }
 
     // Prevent overlaps, patient
     const patientOverlap = await Appointment.findOne({
@@ -91,6 +93,10 @@ const bookAppointment = async (req, res) => {
       reason,
       status: 'BOOKED'
     });
+
+    // CHANGED: do NOT write Notification here.
+    // Let the event bus create notifications using User _ids.
+    bus.emit("appointment.booked", { appointment: appt.toObject() }); // NEW
 
     res.status(201).json({ _id: appt._id, status: appt.status });
   } catch (e) {
@@ -161,13 +167,16 @@ const cancelAppointment = async (req, res) => {
     const appt = await Appointment.findById(id);
 
     if (!appt) return res.status(404).json({ error: 'Appointment not found' });
-
     if (appt.status === 'CANCELLED') {
       return res.json({ _id: appt._id, status: appt.status });
     }
 
     appt.status = 'CANCELLED';
     await appt.save();
+
+    // CHANGED: do NOT write Notification here.
+    // Let the event bus create notifications using User _ids.
+    bus.emit("appointment.canceled", { appointment: appt.toObject() }); // NEW
 
     return res.json({ _id: appt._id, status: appt.status });
   } catch (e) {
@@ -232,6 +241,9 @@ const updateAppointment = async (req, res) => {
     appt.end   = endDate;
     if (reason) appt.reason = reason;
     await appt.save();
+
+    // (Optional) emit a rescheduled event if you want notifications for it later
+    // bus.emit("appointment.rescheduled", { appointment: appt.toObject() }); // OPTIONAL
 
     return res.json({
       _id: appt._id,

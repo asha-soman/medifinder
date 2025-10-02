@@ -9,7 +9,7 @@ const app = express();
 
 require('./shared/observers/profile.listeners');
 
-app.use(cors()); 
+app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', require('./routes/auth.routes'));
@@ -19,6 +19,10 @@ app.use('/api/patient', require('./routes/patient.routes'));
 app.use('/api/notifications', require('./routes/notification.routes')); //--added
 app.use('/api/history', require('./routes/history.routes')); //--added
 app.use('/api/booking', require('./routes/appointments.routes')); //--just added
+app.use('/api/doctor', require('./routes/doctor.availability.routes'));
+app.use('/api/doctor', require('./routes/doctor.appointments.routes'));
+app.use('/api/doctor', require('./routes/doctor.records.routes'));
+
 
 app.use('/api/test', require('./routes/test.routes'));
 

@@ -1,0 +1,94 @@
+.main-container {
+    max-width: 1200px;
+    margin: 24px auto;
+    padding: 0 16px;
+}
+
+.header-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 30px;
+    line-height: 34px;
+    color: #1B3951;
+    text-align: left;
+    margin: 6px 0 12px;
+}
+
+.header-body {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+}
+
+.availability-section {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    grid-gap: 16px;
+    align-items: flex-start;
+}
+
+.left-form,
+.right-form {
+    border: 1px solid rgb(229, 231, 235);
+    border-radius: 8px;
+    padding: 12px;
+    background-color: #DEDEDE;
+}
+
+.left-form {
+    height: 600px;
+}
+
+.form-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.form-label-value {
+    font-size: 16px;
+    color: rgb(68, 68, 68);
+    margin-bottom: 10px;
+}
+
+.form-label {
+    margin-bottom: 30px;
+}
+
+.availability-save.btn {
+    display: block;
+    margin: 30px auto;
+}
+
+.block-checkbox {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.btn-style {
+    width: 121px;
+    height: 40px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-edit {
+    background: #1B3951;
+    color: #fff;
+    margin-right: 10px;
+}
+
+.btn-delete-cancel {
+    background: #a32e2e;
+    color: #fff;
+}
+
+table.btn-delete-cancel tr,
+table.btn-delete-cancel th,
+table.btn-delete-cancel td {
+    text-align: center;
+}
