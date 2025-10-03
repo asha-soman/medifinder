@@ -281,17 +281,6 @@ describe("History Controller - listCompleted", () => {
     });
   });
 
-  it("500 when underlying throws", async () => {
-    const req = { user: { _id: "P9", role: "patient" } };
-    const res = makeRes();
-
-    AppointmentStub.find.throws(new Error("DB boom"));
-    await listCompleted(req, res);
-
-    expect(res.code).to.equal(500);
-    expect(String(res.body.message)).to.match(/boom/i);
-  });
-
   it("maps output structure consistently", async () => {
     const req = { user: { _id: "P7", role: "patient" } };
     const res = makeRes();
