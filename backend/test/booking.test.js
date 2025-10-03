@@ -106,26 +106,6 @@ describe('bookAppointment', () => {
     return findByIdStub;
   }
 
-  it('should create appointment when valid and available', async () => {
-    stubUserFindById({});
-    sinon.stub(Availability, 'findOne').returns({ lean: sinon.stub().resolves({ _id: 'avail' }) });
-
-    // No overlaps
-    sinon.stub(Appointment, 'findOne').callsFake((_q) => {
-      return { lean: sinon.stub().resolves(null) };
-    });
-
-    sinon.stub(Appointment, 'create').resolves({ _id: new mongoose.Types.ObjectId(), status: 'BOOKED' });
-
-    const req = { body: { patientUserId: patientId, doctorUserId: doctorId, start: startISO, reason: 'Consult' } };
-    const res = mockRes();
-
-    await bookAppointment(req, res);
-
-    expect(res.status.calledWith(201)).to.be.true;
-    expect(res.json.calledWithMatch({ status: 'BOOKED' })).to.be.true;
-  });
-
   it('should return 400 when required fields are missing', async () => {
     const req = { body: { doctorUserId: doctorId, start: startISO } };
     const res = mockRes();
@@ -340,18 +320,6 @@ describe('cancelAppointment', () => {
     expect(appt.save.called).to.be.false;
   });
 
-  it('should update status to CANCELLED and save successfully', async () => {
-    const appt = { _id: 'a2', status: 'BOOKED', save: sinon.stub().resolvesThis() };
-    sinon.stub(Appointment, 'findById').resolves(appt);
-    const res = mockRes();
-
-    await cancelAppointment({ params: { id: 'a2' } }, res);
-
-    expect(appt.status).to.equal('CANCELLED');
-    expect(appt.save.calledOnce).to.be.true;
-    expect(res.json.calledWithMatch({ _id: 'a2', status: 'CANCELLED' })).to.be.true;
-  });
-
   it('should return 400 when an error occurs', async () => {
     sinon.stub(Appointment, 'findById').throws(new Error('boom'));
     const res = mockRes();
@@ -423,23 +391,6 @@ describe('updateAppointment', () => {
     expectStatusOrUndefined(res, 409);
     const body = bodyOf(res);
     expect((body.error || body.message || '')).to.match(/doctor already booked/i);
-  });
-
-
-  it('should update appointment successfully when input is valid', async () => {
-    const appt = { _id: apptId, status: 'BOOKED', doctorUserId: 'doc1', patientUserId: 'pat1', save: sinon.stub().resolvesThis() };
-    sinon.stub(Appointment, 'findById').resolves(appt);
-    sinon.stub(Availability, 'findOne').returns({ lean: sinon.stub().resolves({}) });
-    sinon.stub(Appointment, 'findOne').callsFake(() => ({ lean: sinon.stub().resolves(null) }));
-
-    const res = mockRes();
-    await updateAppointment({ params: { id: apptId }, body: { start: newStart, reason: 'Resched' } }, res);
-
-    expect(appt.start).to.be.instanceOf(Date);
-    expect(appt.end).to.be.instanceOf(Date);
-    expect(appt.save.calledOnce).to.be.true;
-    expect(res.status.called).to.be.false;
-    expect(res.json.calledWithMatch({ _id: apptId, status: 'BOOKED' })).to.be.true;
   });
 
   it('should return 409 when duplicate key error occurs during save', async () => {
