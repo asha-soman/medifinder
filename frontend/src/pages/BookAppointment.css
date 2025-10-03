@@ -115,6 +115,11 @@
 .btn-primary:disabled { opacity: .7; cursor: not-allowed; }
 .btn-cancel { background: #893536; color: #FFFFFF; border-color: #893536; }
 
+.input-error { border-color: #d33; outline-color: #d33; }
+.field-error { color: #d33; font-size: 0.85rem; margin-top: 0.25rem; }
+.field-hint { color: #666; font-size: 0.8rem; margin-top: 0.25rem; }
+
+
 @media (max-width: 780px) {
   .form-grid { grid-template-columns: 1fr; }
 }
