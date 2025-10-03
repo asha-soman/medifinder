@@ -191,7 +191,7 @@ export default function DoctorAvailability() {
                                 {rows.map(r => {
                                     const editing = editingId === r.id;
                                     return (
-                                        <tr key={r.id} style={{ borderBottom: "1px solid #f3f3f3" }}>
+                                        <tr key={r.id} style={{ textAlign: "center", borderBottom: "1px solid #f3f3f3" }}>
                                             <td style={{ padding: "10px 6px" }}>
                                                 {editing ? (
                                                     <input type="time" value={editStart} onChange={e => setEditStart(e.target.value)} />
