@@ -40,7 +40,7 @@ bus.on("appointment.booked", async ({ appointment }) => {
       null,
       null
     );
-    console.log("[Notification] BOOKED created ✅");
+    console.log("[Notification] BOOKED created ");
   } catch (err) {
     console.error("Notification creation failed (BOOKED):", err?.message || err);
   }
@@ -57,7 +57,7 @@ bus.on("appointment.rescheduled", async ({ appointment, oldStart }) => {
       `Your appointment was rescheduled from ${oldW} to ${newW}.`,
       `Appointment was rescheduled from ${oldW} to ${newW}.`
     );
-    console.log("[Notification] RESCHEDULED created ✅");
+    console.log("[Notification] RESCHEDULED created ");
   } catch (err) {
     console.error("Notification creation failed (RESCHEDULED):", err?.message || err);
   }
@@ -72,7 +72,7 @@ bus.on("appointment.canceled", async ({ appointment }) => {
       null,
       null
     );
-    console.log("[Notification] CANCELLED created ✅");
+    console.log("[Notification] CANCELLED created ");
   } catch (err) {
     console.error("Notification creation failed (CANCELLED):", err?.message || err);
   }
