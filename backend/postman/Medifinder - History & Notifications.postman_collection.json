@@ -1,0 +1,380 @@
+{
+	"info": {
+		"_postman_id": "e15374a6-bf1d-4df7-83d7-672d6c8b913c",
+		"name": "Medifinder - History & Notifications",
+		"description": "Collection to test History and Notifications APIs (fields aligned to your Mongoose model).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48742743",
+		"_collection_link": "https://www.postman.com/amandaqut-2618759/workspace/medifinder/collection/48742743-e15374a6-bf1d-4df7-83d7-672d6c8b913c?action=share&source=collection_link&creator=48742743"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Save token\", function () {",
+									"    var res = pm.response.json();",
+									"    if (res.token) {",
+									"        // Save token into environment",
+									"        pm.environment.set(\"jwt\", res.token);",
+									"        console.log(\"JWT saved:\", res.token);",
+									"    } else {",
+									"        pm.environment.unset(\"jwt\");",
+									"        console.warn(\"No token found in login response\");",
+									"    }",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"n12202207@qut.edu.au\",\n  \"password\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Create Notification",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status 201/200', function () { pm.expect([200,201]).to.include(pm.response.code); });",
+							"pm.test('Has _id, recipient, message, type', function () {",
+							"  const j = pm.response.json();",
+							"  pm.expect(j).to.have.property('_id');",
+							"  pm.expect(j).to.have.property('recipient');",
+							"  pm.expect(j).to.have.property('message');",
+							"  pm.expect(j).to.have.property('type');",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"recipient\": \"{{userId}}\",\n  \"message\": \"You have a new appointment.\",\n  \"type\": \"BOOKED\",\n  \"appointment\": \"{{appointmentId}}\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/notifications",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"notifications"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Notifications (Unread for user)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+							"pm.test('Returns array', function () { pm.expect(pm.response.json()).to.be.an('array'); });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/notifications?userId={{userId}}&read=false",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"notifications"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "{{userId}}"
+						},
+						{
+							"key": "read",
+							"value": "false"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mark Notification Read",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// PATCH /api/notifications/{{notificationId}}/read  (single)\r",
+							"pm.test(\"Notification marked as read\", function () {\r",
+							"  const jsonData = pm.response.json();\r",
+							"\r",
+							"  // it should be the updated notification object\r",
+							"  pm.expect(jsonData).to.be.an(\"object\");\r",
+							"  pm.expect(jsonData).to.have.property(\"_id\");\r",
+							"  pm.expect(jsonData).to.have.property(\"read\");\r",
+							"  pm.expect(jsonData.read).to.eql(true);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/notifications/{{notificationId}}/read",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"notifications",
+						"{{notificationId}}",
+						"read"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mark All Read (for user)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// PATCH /api/notifications/read-all?userId={{userId}}  (bulk)\r",
+							"pm.test(\"All unread notifications were marked read\", function () {\r",
+							"  const json = pm.response.json();\r",
+							"  pm.expect(json).to.have.property(\"matched\");\r",
+							"  pm.expect(json).to.have.property(\"modified\");\r",
+							"  pm.expect(json.matched).to.be.a(\"number\");\r",
+							"  pm.expect(json.modified).to.be.a(\"number\");\r",
+							"\r",
+							"  // if there were any unread, modified should be >= 1\r",
+							"  pm.expect(json.modified).to.be.at.least(0);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/notifications/read-all?userId={{userId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"notifications",
+						"read-all"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "{{userId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get History (Completed)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"History items have patient and doctor\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.items[0]).to.have.property(\"patient\");",
+							"    pm.expect(jsonData.items[0]).to.have.property(\"doctor\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/history?userId={{userId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"history"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "{{userId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5001"
+		},
+		{
+			"key": "jwt",
+			"value": ""
+		},
+		{
+			"key": "userId",
+			"value": ""
+		},
+		{
+			"key": "appointmentId",
+			"value": ""
+		},
+		{
+			"key": "notificationId",
+			"value": ""
+		}
+	]
+}
