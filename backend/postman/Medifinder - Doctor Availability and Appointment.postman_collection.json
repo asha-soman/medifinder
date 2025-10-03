@@ -1,0 +1,957 @@
+{
+	"info": {
+		"_postman_id": "77ad6af1-bc21-471b-a030-8ef3b1cb7f3a",
+		"name": "Medifinder - Doctor Availability and Appointment",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12279039",
+		"_collection_link": "https://ifn636-api-team.postman.co/workspace/ifn636-workspace~b3f3976c-131b-440c-9f27-9896daa8705a/collection/12279039-77ad6af1-bc21-471b-a030-8ef3b1cb7f3a?action=share&source=collection_link&creator=12279039"
+	},
+	"item": [
+		{
+			"name": "Doctor registration",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"name\": \"poornimaa\",\r\n\"email\": \"poornima10@gmail.com\",\r\n\"password\": \"poornima12345\",\r\n\"role\": \"doctor\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Patient registration",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Alice Patient\",\r\n  \"email\": \"alice@example.com\",\r\n  \"password\": \"123456\",\r\n  \"role\": \"patient\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Booking appointment",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRjOGJiNzc3NTEwOWYxMzgwMzc0MDQiLCJyb2xlIjoiZG9jdG9yIiwiaWF0IjoxNzU5Mjg0MTUxLCJleHAiOjE3NTk4ODg5NTF9.Q1hdP9nRsqJxIxrlVzBpA9jYL8cIzrbzjnyJAgGdT1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"patientId\": \"68dd43cee72e04b4b9a84ffb\",\r\n  \"doctorId\": \"68dd41c7e72e04b4b9a84ff6\",\r\n  \"start\": \"2025-10-10T09:00:00.000+00:00\",\r\n  \"reason\": \"General checkup\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/booking/book",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"booking",
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRjOGJiNzc3NTEwOWYxMzgwMzc0MDQiLCJyb2xlIjoiZG9jdG9yIiwiaWF0IjoxNzU5Mjg0MTUxLCJleHAiOjE3NTk4ODg5NTF9.Q1hdP9nRsqJxIxrlVzBpA9jYL8cIzrbzjnyJAgGdT1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"doctorUserId\": \"68dc8bb7775109f138037404\",\r\n  \"date\": \"2025-10-05\",\r\n  \"startTime\": \"2025-10-05T09:00:00.000Z\",\r\n  \"endTime\": \"2025-10-05T11:00:00.000Z\",\r\n  \"isBlocked\": false\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/doctor/availability",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"doctor",
+						"availability"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRjOGJiNzc3NTEwOWYxMzgwMzc0MDQiLCJyb2xlIjoiZG9jdG9yIiwiaWF0IjoxNzU5Mjg0MTUxLCJleHAiOjE3NTk4ODg5NTF9.Q1hdP9nRsqJxIxrlVzBpA9jYL8cIzrbzjnyJAgGdT1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/doctor/availability",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"doctor",
+						"availability"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRjOGJiNzc3NTEwOWYxMzgwMzc0MDQiLCJyb2xlIjoiZG9jdG9yIiwiaWF0IjoxNzU5Mjg0MTUxLCJleHAiOjE3NTk4ODg5NTF9.Q1hdP9nRsqJxIxrlVzBpA9jYL8cIzrbzjnyJAgGdT1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/doctor/availability?date=2025-10-05",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"doctor",
+						"availability"
+					],
+					"query": [
+						{
+							"key": "date",
+							"value": "2025-10-05"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRjOGJiNzc3NTEwOWYxMzgwMzc0MDQiLCJyb2xlIjoiZG9jdG9yIiwiaWF0IjoxNzU5Mjg0MTUxLCJleHAiOjE3NTk4ODg5NTF9.Q1hdP9nRsqJxIxrlVzBpA9jYL8cIzrbzjnyJAgGdT1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n \"doctorUserId\": \"68dc8bb7775109f138037404\",\r\n  \"date\": \"2025-10-05\",\r\n  \"startTime\": \"2025-10-05T09:30:00.000Z\",\r\n  \"endTime\": \"2025-10-05T11:00:00.000Z\",\r\n  \"isBlocked\": false\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/doctor/availability",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"doctor",
+						"availability"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "adding a new availability",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRjOGJiNzc3NTEwOWYxMzgwMzc0MDQiLCJyb2xlIjoiZG9jdG9yIiwiaWF0IjoxNzU5Mjg0MTUxLCJleHAiOjE3NTk4ODg5NTF9.Q1hdP9nRsqJxIxrlVzBpA9jYL8cIzrbzjnyJAgGdT1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"doctorUserId\": \"68dc8bb7775109f138037404\",\r\n  \"date\": \"2025-10-05T00:00:00.000Z\",\r\n  \"startTime\": \"2025-10-05T09:00:00.000Z\",\r\n  \"endTime\": \"2025-10-05T11:00:00.000Z\",\r\n  \"isBlocked\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/doctor/availability",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"doctor",
+						"availability"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRjOGJiNzc3NTEwOWYxMzgwMzc0MDQiLCJyb2xlIjoiZG9jdG9yIiwiaWF0IjoxNzU5Mjg0MTUxLCJleHAiOjE3NTk4ODg5NTF9.Q1hdP9nRsqJxIxrlVzBpA9jYL8cIzrbzjnyJAgGdT1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5001/api/doctor/availability?date=2025-10-05T00:00:00.000Z",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"doctor",
+						"availability"
+					],
+					"query": [
+						{
+							"key": "date",
+							"value": "2025-10-05T00:00:00.000Z"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRjOGJiNzc3NTEwOWYxMzgwMzc0MDQiLCJyb2xlIjoiZG9jdG9yIiwiaWF0IjoxNzU5Mjg0MTUxLCJleHAiOjE3NTk4ODg5NTF9.Q1hdP9nRsqJxIxrlVzBpA9jYL8cIzrbzjnyJAgGdT1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"endTime\": \"2025-10-05T12:00:00.000Z\" }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/doctor/availability/68dcf076fb309e6182ce9082",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"doctor",
+						"availability",
+						"68dcf076fb309e6182ce9082"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "adding new availability with design patterns",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRjOGJiNzc3NTEwOWYxMzgwMzc0MDQiLCJyb2xlIjoiZG9jdG9yIiwiaWF0IjoxNzU5Mjg0MTUxLCJleHAiOjE3NTk4ODg5NTF9.Q1hdP9nRsqJxIxrlVzBpA9jYL8cIzrbzjnyJAgGdT1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"doctorUserId\": \"68dc8bb7775109f138037404\",\r\n  \"date\": \"2025-10-06T00:00:00.000Z\",\r\n  \"startTime\": \"2025-10-06T09:00:00.000Z\",\r\n  \"endTime\": \"2025-10-06T11:00:00.000Z\",\r\n  \"isBlocked\": false\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/doctor/availability",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"doctor",
+						"availability"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "retriveing availability with design pattern",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRjOGJiNzc3NTEwOWYxMzgwMzc0MDQiLCJyb2xlIjoiZG9jdG9yIiwiaWF0IjoxNzU5Mjg0MTUxLCJleHAiOjE3NTk4ODg5NTF9.Q1hdP9nRsqJxIxrlVzBpA9jYL8cIzrbzjnyJAgGdT1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5001/api/doctor/availability?date=2025-10-06T00:00:00.000Z",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"doctor",
+						"availability"
+					],
+					"query": [
+						{
+							"key": "date",
+							"value": "2025-10-06T00:00:00.000Z"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updating with design pattern",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRjOGJiNzc3NTEwOWYxMzgwMzc0MDQiLCJyb2xlIjoiZG9jdG9yIiwiaWF0IjoxNzU5Mjg0MTUxLCJleHAiOjE3NTk4ODg5NTF9.Q1hdP9nRsqJxIxrlVzBpA9jYL8cIzrbzjnyJAgGdT1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"endTime\": \"2025-10-06T18:00:00.000Z\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/doctor/availability/68dcf6afec960ebd3663f896",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"doctor",
+						"availability",
+						"68dcf6afec960ebd3663f896"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "blocked unblocked check",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRjOGJiNzc3NTEwOWYxMzgwMzc0MDQiLCJyb2xlIjoiZG9jdG9yIiwiaWF0IjoxNzU5Mjg0MTUxLCJleHAiOjE3NTk4ODg5NTF9.Q1hdP9nRsqJxIxrlVzBpA9jYL8cIzrbzjnyJAgGdT1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"doctorUserId\": \"68dc8bb7775109f138037404\",\r\n  \"date\": \"2025-10-26T00:00:00.000Z\",\r\n  \"startTime\": \"2025-10-26T09:00:00.000Z\",\r\n  \"endTime\": \"2025-10-26T12:00:00.000Z\",\r\n  \"isBlocked\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/doctor/availability",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"doctor",
+						"availability"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "new patient registration",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRjOGJiNzc3NTEwOWYxMzgwMzc0MDQiLCJyb2xlIjoiZG9jdG9yIiwiaWF0IjoxNzU5Mjg0MTUxLCJleHAiOjE3NTk4ODg5NTF9.Q1hdP9nRsqJxIxrlVzBpA9jYL8cIzrbzjnyJAgGdT1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Patient1\",\r\n  \"email\": \"patient1@example.com\",\r\n  \"password\": \"123456\",\r\n  \"role\": \"patient\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "booking slot as patient",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRkMzI0YjRmMDY2NGJiODc0YmJjN2QiLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTc1OTMyNjc5NSwiZXhwIjoxNzU5OTMxNTk1fQ.pwyDIQhA1NMhax7GfzlzsuBzDhC8pZgpmhtYzJn5zic",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"patientId\": \"68dd324b4f0664bb874bbc7d\",\r\n  \"doctorId\": \"68dc8bb7775109f138037404\",\r\n  \"start\": \"2025-10-26T10:00:00.000Z\",\r\n  \"end\":   \"2025-10-26T11:00:00.000Z\",\r\n  \"reason\": \"General checkup\",\r\n  \"status\": \"BOOKED\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/booking/book",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"booking",
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "doctor registration 2",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRkNDFjN2U3MmUwNGI0YjlhODRmZjYiLCJyb2xlIjoiZG9jdG9yIiwiaWF0IjoxNzU5MzMwNzU5LCJleHAiOjE3NTk5MzU1NTl9.p3U7uBkAYkKS1e6bNhSM_4UW4Mp38SIYubqAgqjkjWU",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"name\": \"doctor2\",\r\n\"email\": \"doctor2@gmail.com\",\r\n\"password\": \"123456\",\r\n\"role\": \"doctor\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "adding new availability with doctor 2",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRkNDFjN2U3MmUwNGI0YjlhODRmZjYiLCJyb2xlIjoiZG9jdG9yIiwiaWF0IjoxNzU5MzMwNzU5LCJleHAiOjE3NTk5MzU1NTl9.p3U7uBkAYkKS1e6bNhSM_4UW4Mp38SIYubqAgqjkjWU",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"doctorUserId\": \"68dd41c7e72e04b4b9a84ff6\",\r\n  \"date\": \"2025-10-10T00:00:00.000Z\",\r\n  \"startTime\": \"2025-10-10T09:00:00.000Z\",\r\n  \"endTime\": \"2025-10-10T11:00:00.000Z\",\r\n  \"isBlocked\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/doctor/availability",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"doctor",
+						"availability"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "patient 2 registration",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRkNDNjZWU3MmUwNGI0YjlhODRmZmIiLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTc1OTMzMTI3OCwiZXhwIjoxNzU5OTM2MDc4fQ.MLU-1RsRBzulVt6L164axnXA6fNqbtrK-giNPoSjit4",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Patient 2\",\r\n  \"email\": \"patient2@example.com\",\r\n  \"password\": \"123456\",\r\n  \"role\": \"patient\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "booking an appointment with patient 2",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRkNDNjZWU3MmUwNGI0YjlhODRmZmIiLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTc1OTMzMTI3OCwiZXhwIjoxNzU5OTM2MDc4fQ.MLU-1RsRBzulVt6L164axnXA6fNqbtrK-giNPoSjit4",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"patientId\": \"68dc9123775109f138037407\",\r\n    \"doctorId\": \"68dc8bb7775109f138037404\",\r\n    \"start\": \"2025-10-05T09:00:00.000Z\",\r\n    \"end\": \"2025-10-05T09:30:00.000Z\",\r\n    \"reason\": \"General checkup\",\r\n    \"status\": \"BOOKED\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/booking/book",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"booking",
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "adding slot 2 under doctor 2",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRkNDFjN2U3MmUwNGI0YjlhODRmZjYiLCJyb2xlIjoiZG9jdG9yIiwiaWF0IjoxNzU5MzMwNzU5LCJleHAiOjE3NTk5MzU1NTl9.p3U7uBkAYkKS1e6bNhSM_4UW4Mp38SIYubqAgqjkjWU",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"doctorUserId\": \"68dd41c7e72e04b4b9a84ff6\",\r\n  \"date\": \"2025-08-10T00:00:00.000Z\",\r\n  \"startTime\": \"2025-08-10T09:00:00.000Z\",\r\n  \"endTime\": \"2025-08-10T11:00:00.000Z\",\r\n  \"isBlocked\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/doctor/availability",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"doctor",
+						"availability"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRkNDFjN2U3MmUwNGI0YjlhODRmZjYiLCJyb2xlIjoiZG9jdG9yIiwiaWF0IjoxNzU5MzMwNzU5LCJleHAiOjE3NTk5MzU1NTl9.p3U7uBkAYkKS1e6bNhSM_4UW4Mp38SIYubqAgqjkjWU",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"date\": \"2025-12-12T00:00:00.000+00:00\",\r\n\"startTime\" : \"2025-12-12T09:00:00.000+00:00\",\r\n\"endTime\" : \"2025-12-12T11:00:00.000+00:00\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/doctor/availability/68ddcaa6b7bd67c86f804810",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"doctor",
+						"availability",
+						"68ddcaa6b7bd67c86f804810"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "book appointment for patient 2",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRkNDNjZWU3MmUwNGI0YjlhODRmZmIiLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTc1OTMzMTI3OCwiZXhwIjoxNzU5OTM2MDc4fQ.MLU-1RsRBzulVt6L164axnXA6fNqbtrK-giNPoSjit4",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"patientUserId\": \"68dd43cee72e04b4b9a84ffb\",\r\n  \"doctorUserId\": \"68dd41c7e72e04b4b9a84ff6\",\r\n  \"start\": \"2025-12-12T09:00:00.000Z\",\r\n  \"end\": \"2025-12-12T10:00:00.000Z\",\r\n  \"reason\": \"General checkup\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/booking/book",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"booking",
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRkNDFjN2U3MmUwNGI0YjlhODRmZjYiLCJyb2xlIjoiZG9jdG9yIiwiaWF0IjoxNzU5MzMwNzU5LCJleHAiOjE3NTk5MzU1NTl9.p3U7uBkAYkKS1e6bNhSM_4UW4Mp38SIYubqAgqjkjWU",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5001/api/doctor/appointments?date=2025-12-12",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"doctor",
+						"appointments"
+					],
+					"query": [
+						{
+							"key": "date",
+							"value": "2025-12-12"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
