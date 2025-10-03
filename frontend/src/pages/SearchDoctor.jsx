@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import doctorsImg from "../assets/doctors.png";
 import { searchDoctors, getSpecialties } from "../api/bookingApi";
 import "./SearchDoctor.css";
-
+ 
 /* ---------- Helpers ---------- */
 const todayLocal = () => {
   const d = new Date();
@@ -13,7 +13,7 @@ const todayLocal = () => {
   const day = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
 };
-
+ 
 const addDays = (yyyyMmDd, n) => {
   const d = new Date(`${yyyyMmDd}T00:00:00Z`);
   d.setUTCDate(d.getUTCDate() + n);
@@ -22,16 +22,15 @@ const addDays = (yyyyMmDd, n) => {
   const day = String(d.getUTCDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
 };
-
-/* mark a slot as free (filters out booked/completed/taken/unavailable) */
+ 
+/* treat only clearly-free slots as displayable */
 const isFreeSlot = (s) => {
-  if (typeof s !== "object" || s === null) return true; // plain ISO string
-  const booked =
-    s.booked || s.isBooked || s.taken || s.unavailable || s.available === false;
+  if (typeof s !== "object" || s === null) return true; // plain ISO string is assumed free
+  const booked = s.booked || s.isBooked || s.taken || s.unavailable || s.available === false;
   const st = (s.status || s.state || "").toLowerCase();
   return !booked && !/booked|taken|unavailable|completed|complete|cancel/.test(st);
 };
-
+ 
 /* normalize API search response into UI shape */
 const normalizeDoctorsResponse = (data) => {
   const list = Array.isArray(data?.items) ? data.items : Array.isArray(data) ? data : [];
@@ -49,31 +48,8 @@ const normalizeDoctorsResponse = (data) => {
     };
   });
 };
-
-// find next date with available slots
-const findNextAvailableDate = async ({ name, specialty, startDate }) => {
-  const normalizedSpec = specialty && specialty !== "All" ? specialty : undefined;
-  const maxHorizon = 14;
-  for (let i = 0; i <= maxHorizon; i++) {
-    const dateStr = addDays(startDate, i);
-    const data = await searchDoctors({
-      name: name?.trim() || undefined,
-      specialty: normalizedSpec, // mapped in bookingApi
-      date: dateStr,
-      page: 1,
-      limit: 5,
-    });
-    const list = Array.isArray(data?.items) ? data.items : Array.isArray(data) ? data : [];
-    const hasAnySlots = list.some((item) => (item.availableSlots || item.slots || []).length > 0);
-    if (hasAnySlots) return { dateStr, data };
-  }
-  return null;
-};
-
-const filterBySlotsIfDated = (list, hasDate) =>
-  hasDate ? list.filter((d) => Array.isArray(d.slots) && d.slots.length > 0) : list;
-
-/* ----- Just-in-time slot revalidation helpers ----- */
+ 
+/* robust doc+slot helpers (for revalidation) */
 const findDoctorInResults = (list, doc) => {
   const wantId = doc.doctorId || doc.doctorUserId || doc._id;
   return (
@@ -89,19 +65,70 @@ const findDoctorInResults = (list, doc) => {
     null
   );
 };
-
 const extractSlots = (docObj) => {
   if (!docObj) return [];
   const raw = docObj.availableSlots ?? docObj.slots ?? [];
   return (Array.isArray(raw) ? raw : [])
     .filter(isFreeSlot)
     .map((s) => (typeof s === "string" ? s : (s?.start || s?.startTime || s?.iso)))
-  .filter(Boolean);
+    .filter(Boolean);
 };
-
+ 
+// replace your current findNextAvailableDate with this future-aware version
+const findNextAvailableDate = async ({ name, specialty, startDate }) => {
+  const normalizedSpec = specialty && specialty !== "All" ? specialty : undefined;
+  const maxHorizon = 30;
+  const todayStr = todayLocal();
+ 
+  const hasFutureFreeSlot = (dateStr, items) => {
+    const nowMs = Date.now();
+    return items.some((item) => {
+      const raw = item.availableSlots ?? item.slots ?? [];
+      const arr = Array.isArray(raw) ? raw : [];
+      return arr.some((s) => {
+        // free?
+        if (!isFreeSlot(s)) return false;
+        // extract ISO
+        const iso = typeof s === "string" ? s : (s.start || s.startTime || s.iso || "");
+        if (!iso) return false;
+        // if we're checking today, only count FUTURE times
+        if (dateStr === todayStr) return new Date(iso).getTime() > nowMs;
+        return true;
+      });
+    });
+  };
+ 
+  for (let i = 0; i <= maxHorizon; i++) {
+    const dateStr = addDays(startDate, i);
+ 
+    let page = 1;
+    let pages = 1;
+    do {
+      const data = await searchDoctors({
+        name: name?.trim() || undefined,
+        specialty: normalizedSpec,
+        date: dateStr,
+        page,
+        limit: 100, // search widely across doctors per day
+      });
+ 
+      const items = Array.isArray(data?.items) ? data.items : Array.isArray(data) ? data : [];
+ 
+      if (hasFutureFreeSlot(dateStr, items)) {
+        return { dateStr, data: { ...data, items } };
+      }
+ 
+      pages = Number(data?.pages || 1);
+      page = Number(data?.page || page) + 1;
+    } while (page <= pages);
+  }
+  return null;
+};
+ 
+/* revalidate a slot just-in-time */
 const validateSlotAvailable = async ({ doctor, slotISO, dateStr }) => {
   const params = {
-    doctorUserId: doctor.doctorId || doctor.doctorUserId || doctor._id, // if backend supports
+    doctorUserId: doctor.doctorId || doctor.doctorUserId || doctor._id, // if backend supports this filter
     name: doctor.doctorName || doctor.name,
     specialty: doctor.specialty || doctor.specialization,
     date: dateStr,
@@ -114,37 +141,40 @@ const validateSlotAvailable = async ({ doctor, slotISO, dateStr }) => {
   const slots = extractSlots(match);
   return slots.includes(slotISO);
 };
-
+ 
 /* ---------- Component ---------- */
 export default function SearchDoctor() {
-  // inputs (left blank so placeholders show)
+  // filters
   const [name, setName] = useState("");
   const [specialty, setSpecialty] = useState("");
   const [date, setDate] = useState("");
-
+ 
   // data
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [specialties, setSpecialties] = useState([]);
   const [error, setError] = useState("");
-
+ 
   // paging
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
-
-  // UI hint for auto-selected date
-  const [autoSelectedDate, setAutoSelectedDate] = useState("");
-
-  // single selection across ALL doctors
+ 
+  // UX: banner & initial behavior
+  const [isPristine, setIsPristine] = useState(true);       // true until user touches any filter or searches
+  const [autoSelectedDate, setAutoSelectedDate] = useState(""); // earliest date found on pristine load
+ 
+  // selection
   const [selected, setSelected] = useState({ doctorId: null, slotISO: null });
-
-  // just-in-time check flag
   const [checking, setChecking] = useState(false);
-
+ 
   const navigate = useNavigate();
-  const effectiveDate = date || autoSelectedDate || todayLocal();
-  const hasDateInEffect = !!(date || autoSelectedDate);
-
+ 
+  // compute which date (if any) we’re using for queries in this render
+  // - pristine: use autoSelectedDate (if found)
+  // - after user filters: only use user-picked date (no implicit "today")
+  const dateParam = isPristine ? (autoSelectedDate || undefined) : (date || undefined);
+  const dayIsToday = dateParam === todayLocal();
+ 
   /* Load specialties once */
   useEffect(() => {
     (async () => {
@@ -169,8 +199,8 @@ export default function SearchDoctor() {
       }
     })();
   }, []);
-
-  /* Auto-pick next available date (but keep inputs blank so placeholders show) */
+ 
+  /* First load: find the earliest date with availability and show it */
   useEffect(() => {
     (async () => {
       try {
@@ -179,34 +209,55 @@ export default function SearchDoctor() {
         if (found) {
           setAutoSelectedDate(found.dateStr);
           const normalized = normalizeDoctorsResponse(found.data);
-          setResults(filterBySlotsIfDated(normalized, true));
+          setResults(normalized);  // show the earliest date’s slots immediately
           setPage(Number(found.data?.page || 1));
           setPages(Number(found.data?.pages || 1));
         } else {
-          const data = await searchDoctors({ page: 1, limit: 5 });
-          const normalized = normalizeDoctorsResponse(data);
-          setResults(filterBySlotsIfDated(normalized, false));
-          setPage(Number(data?.page || 1));
-          setPages(Number(data?.pages || 1));
+          // No availability in horizon — show empty but keep pristine banner off (it will be false only after user action)
+          setResults([]);
+          setPage(1);
+          setPages(1);
         }
-      } catch {}
+      } catch {
+        // swallow on initial load
+      }
     })();
   }, []);
-
+ 
+  /* ---------- Event handlers: flip pristine off on any user change ---------- */
+  const markNotPristine = () => {
+    if (isPristine) {
+      setIsPristine(false);
+      setAutoSelectedDate(""); // hide banner once user interacts with filters
+    }
+  };
+ 
+  const onChangeName = (e) => { setName(e.target.value); markNotPristine(); };
+  const onChangeSpec = (e) => { setSpecialty(e.target.value); setPage(1); setSelected({ doctorId: null, slotISO: null }); markNotPristine(); };
+  const onChangeDate = (e) => { setDate(e.target.value); setPage(1); setSelected({ doctorId: null, slotISO: null }); markNotPristine(); };
+ 
+  /* Fetch a specific page using the current dateParam logic */
   const fetchPage = async (targetPage = 1) => {
     setLoading(true);
     setError("");
     try {
       const normalizedSpec = specialty && specialty !== "All" ? specialty : undefined;
+ 
+      // IMPORTANT: if not pristine and no user date, do NOT pass a date at all
+      const queryDate = isPristine ? (autoSelectedDate || undefined) : (date || undefined);
+ 
       const data = await searchDoctors({
         name: name.trim() || undefined,
-        specialty: normalizedSpec, // mapped in bookingApi
-        date: effectiveDate,
+        specialty: normalizedSpec,
+        ...(queryDate ? { date: queryDate } : {}),
         page: targetPage,
         limit: 5,
       });
+ 
       const normalized = normalizeDoctorsResponse(data);
-      setResults(filterBySlotsIfDated(normalized, hasDateInEffect));
+      // Only filter out “no slot” doctors when a date is actually applied
+      const withDate = !!queryDate;
+      setResults(withDate ? normalized.filter((d) => d.slots?.length) : normalized);
       setPage(Number(data?.page || targetPage));
       setPages(Number(data?.pages || 1));
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -216,44 +267,41 @@ export default function SearchDoctor() {
       setLoading(false);
     }
   };
-
+ 
   const onSearch = async () => {
     setError("");
-    setLoading(true);
     setSelected({ doctorId: null, slotISO: null });
+ 
+    // user-triggered search: turn off pristine & banner
+    if (isPristine) {
+      setIsPristine(false);
+      setAutoSelectedDate("");
+    }
+ 
+    setLoading(true);
     try {
       const normalizedSpec = specialty && specialty !== "All" ? specialty : undefined;
+      const queryDate = date || undefined; // after user filters, do not force any date
+ 
       const data = await searchDoctors({
         name: name.trim() || undefined,
         specialty: normalizedSpec,
-        date: effectiveDate,
+        ...(queryDate ? { date: queryDate } : {}),
         page: 1,
         limit: 5,
       });
-
-      const list = Array.isArray(data?.items) ? data.items : Array.isArray(data) ? data : [];
-      const hasAnySlots = list.some((item) => (item.availableSlots || item.slots || []).length > 0);
-
-      if (hasAnySlots) {
-        const normalized = normalizeDoctorsResponse(data);
-        setResults(filterBySlotsIfDated(normalized, hasDateInEffect));
-        setPage(Number(data?.page || 1));
-        setPages(Number(data?.pages || 1));
-        setAutoSelectedDate("");
-      } else {
-        const found = await findNextAvailableDate({ name, specialty, startDate: effectiveDate });
-        if (found) {
-          setAutoSelectedDate(found.dateStr);
-          const normalizedFound = normalizeDoctorsResponse(found.data);
-          setResults(filterBySlotsIfDated(normalizedFound, true));
-          setPage(Number(found.data?.page || 1));
-          setPages(Number(found.data?.pages || 1));
-        } else {
-          setResults([]);
-          setPages(1);
-          setPage(1);
-          setError("No availability found in the next 14 days.");
-        }
+ 
+      const normalized = normalizeDoctorsResponse(data);
+      const withDate = !!queryDate;
+      const finalList = withDate ? normalized.filter((d) => d.slots?.length) : normalized;
+ 
+      setResults(finalList);
+      setPage(Number(data?.page || 1));
+      setPages(Number(data?.pages || 1));
+ 
+      if (!finalList.length) {
+        // No availability for these filters; we purposely do NOT auto-pick a date anymore.
+        setError("No results found with your filters.");
       }
     } catch {
       setError("Search failed. Please try again.");
@@ -261,22 +309,28 @@ export default function SearchDoctor() {
       setLoading(false);
     }
   };
-
+ 
   const chooseSlot = (doctorId, slotISO) => setSelected({ doctorId, slotISO });
-
+ 
   const goToBook = async (doctor) => {
     if (checking) return;
     if (selected.doctorId !== doctor.doctorId || !selected.slotISO) {
       alert("Please select a time slot first.");
       return;
     }
+    // must have a dateParam to validate (slots only render when there's a dateParam on pristine, or user provided one)
+    const dateForCheck = dateParam;
+    if (!dateForCheck) {
+      alert("Please pick a date first.");
+      return;
+    }
+ 
     try {
       setChecking(true);
-      // revalidate availability just-in-time
       const ok = await validateSlotAvailable({
         doctor,
         slotISO: selected.slotISO,
-        dateStr: effectiveDate,
+        dateStr: dateForCheck,
       });
       if (!ok) {
         alert("That time was just taken. Refreshing availability…");
@@ -288,7 +342,7 @@ export default function SearchDoctor() {
       setChecking(false);
     }
   };
-
+ 
   /* Pagination  */
   const Pagination = () => {
     const totalPages = Math.max(1, Number(pages) || 1);
@@ -296,10 +350,10 @@ export default function SearchDoctor() {
     const WINDOW = 5;
     const start = Math.max(1, Math.min(current - Math.floor(WINDOW / 2), totalPages - WINDOW + 1));
     const end = Math.min(totalPages, start + WINDOW - 1);
-
+ 
     const canPrevWindow = start > 1;
     const canNextWindow = end < totalPages;
-
+ 
     return (
       <div className="search-page__pagination">
         <button className="search-page__page-link search-page__chev" onClick={() => fetchPage(start - 1)} disabled={!canPrevWindow}>
@@ -316,7 +370,7 @@ export default function SearchDoctor() {
       </div>
     );
   };
-
+ 
   return (
     <div className="search-page">
       {/* HERO */}
@@ -336,7 +390,7 @@ export default function SearchDoctor() {
           </p>
         </div>
       </section>
-
+ 
       {/* FIND A DOCTOR */}
       <section className="search-card">
         <div className="card-title">Find A Doctor</div>
@@ -345,33 +399,23 @@ export default function SearchDoctor() {
             className="search-card__input"
             placeholder="Name"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={onChangeName}
             onKeyDown={(e) => e.key === "Enter" && onSearch()}
             aria-label="Doctor name"
           />
-
-          {/* Specialty */}
           <select
             className="search-card__input"
             value={specialty}
-            onChange={(e) => {
-              setSpecialty(e.target.value);
-              setPage(1);
-              setSelected({ doctorId: null, slotISO: null });
-            }}
+            onChange={onChangeSpec}
             onKeyDown={(e) => e.key === "Enter" && onSearch()}
             aria-label="Specialty"
           >
             <option value="" disabled hidden>Specialty</option>
             <option value="All">All</option>
-            {specialties
-              .filter((s) => s && s !== "All")
-              .map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
+            {specialties.filter((s) => s && s !== "All").map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
           </select>
-
-          {/* Date */}
           <input
             type={date ? "date" : "text"}
             className="search-card__input"
@@ -381,42 +425,36 @@ export default function SearchDoctor() {
               if (!date) e.target.type = "date";
               e.target.min = todayLocal();
             }}
-            onBlur={(e) => {
-              if (!e.target.value) e.target.type = "text";
-            }}
-            onChange={(e) => {
-              setDate(e.target.value);
-              setPage(1);
-              setSelected({ doctorId: null, slotISO: null });
-            }}
+            onBlur={(e) => { if (!e.target.value) e.target.type = "text"; }}
+            onChange={onChangeDate}
             onKeyDown={(e) => e.key === "Enter" && onSearch()}
             aria-label="Date"
           />
-
           <button className="search-card__btn" onClick={onSearch} disabled={loading}>
             {loading ? "Searching…" : "Search"}
           </button>
         </div>
         {error && <div className="form-error">{error}</div>}
       </section>
-
-      {/* Right-aligned hint under the card */}
-      {autoSelectedDate && (
+ 
+      {/* Show banner ONLY on pristine first load, not after user filters */}
+      {isPristine && autoSelectedDate && (
         <div className="auto-hint">
-          Showing next available date: {new Date(`${autoSelectedDate}T00:00:00Z`).toLocaleDateString()}
+          Showing next available date:{" "}
+          {new Date(`${autoSelectedDate}T00:00:00Z`).toLocaleDateString()}
         </div>
       )}
-
+ 
       {/* RESULTS */}
       <section className="results">
         {results.map((doc) => {
           const active = selected.doctorId === doc.doctorId && !!selected.slotISO;
-
-          // Hide past times if viewing today
+ 
+          // Hide past times if the applied date is today
           const slotsForDisplay = (doc.slots || []).filter((s) =>
-            effectiveDate === todayLocal() ? new Date(s).getTime() > Date.now() : true
+            dayIsToday ? new Date(s).getTime() > Date.now() : true
           );
-
+ 
           return (
             <div key={doc.doctorId} className="result-card">
               <div className="left-stack">
@@ -425,7 +463,7 @@ export default function SearchDoctor() {
                   <div className="doctor-spec">{doc.specialty}</div>
                 </div>
                 <div className="slot-wrap">
-                  {(date || autoSelectedDate) ? (
+                  {dateParam ? (
                     slotsForDisplay.length ? (
                       slotsForDisplay.map((s) => (
                         <button
@@ -445,21 +483,23 @@ export default function SearchDoctor() {
                   )}
                 </div>
               </div>
-
+ 
               <div className="book-col">
-                <button className="btn-book" onClick={() => goToBook(doc)} disabled={checking}>
+                <button className="btn-book" onClick={() => goToBook(doc)} disabled={checking || !dateParam}>
                   {checking ? "Checking…" : "Book"}
                 </button>
               </div>
             </div>
           );
         })}
-
-        {!loading && results.length === 0 && <div className="muted">No results yet — try searching.</div>}
-
+ 
+        {!loading && results.length === 0 && (
+          <div className="muted">No results yet — try searching.</div>
+        )}
+ 
         <Pagination />
       </section>
-
+ 
       {/* Stats block kept as-is */}
       <section className="site-stats">
         <h3 className="stats-heading">Building Trust Through Care</h3>

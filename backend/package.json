@@ -37,6 +37,7 @@
     "mocha": "^11.7.4",
     "mochawesome": "^7.1.4",
     "mongodb-memory-server": "^10.2.1",
+    "chai-http": "^5.1.2",
     "nodemon": "^3.1.4",
     "nyc": "^17.1.0",
     "proxyquire": "^2.1.3",
