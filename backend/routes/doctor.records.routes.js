@@ -7,7 +7,7 @@ const MedicalRecord = require('../models/medicalRecord.model');
 async function enforceDoctorOwnsAppointment(doctorUserId, appointmentId) {
     const appt = await Appointment.findById(appointmentId).lean();
     if (!appt) throw new Error('Appointment not found');
-    if (String(appt.doctorUserId) !== String(doctorUserId)) {   // ✅ doctorUserId
+    if (String(appt.doctorUserId) !== String(doctorUserId)) {
         const err = new Error('Forbidden');
         err.status = 403;
         throw err;
