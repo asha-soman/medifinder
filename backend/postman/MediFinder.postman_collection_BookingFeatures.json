@@ -1,0 +1,59 @@
+{
+	"info": {
+		"_postman_id": "e4a7004e-9364-4c22-9b53-453538267d27",
+		"name": "MediFinder",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48308294",
+		"_collection_link": "https://hannahfojas-4417610.postman.co/workspace/Hannah-Grace-Fojas's-Workspace~033b7a31-c1f8-480f-84f7-f78b5101a20c/collection/48308294-e4a7004e-9364-4c22-9b53-453538267d27?action=share&source=collection_link&creator=48308294"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "searchDoctors",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "bookAppointment",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "editAppointment",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "cancelAppointment",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "getMyAppointment",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
