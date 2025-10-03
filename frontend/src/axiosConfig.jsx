@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://15.134.76.220:5001/api",   // << include /api here
+  baseURL: "http://localhost:5001/api" ,   // << include /api here
   headers: { "Content-Type": "application/json", Accept: "application/json" },
 });
 

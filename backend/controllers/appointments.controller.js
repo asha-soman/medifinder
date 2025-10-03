@@ -1,13 +1,12 @@
-// revised too to current correct models
-
+// backend/controllers/appointments.controller.js
 const Appointment   = require('../models/appointment.model');
 const Availability  = require('../models/availability.model');
 const { findSlots } = require('../services/slots.service');
 const { UserModel: User } = require('../models/user.model');
 const DoctorProfile  = require('../models/doctorProfile.model');
-const bus = require("../shared/utils/event.Bus"); // from Amanda
+const bus = require("../shared/utils/event.Bus"); // (no change)
 
-// Search doctors
+// ---------------- Search doctors ----------------
 const searchDoctors = async (req, res) => {
   try {
     const { date, specialization, name, page = 1, limit = 5 } = req.query;
@@ -24,7 +23,7 @@ const searchDoctors = async (req, res) => {
   }
 };
 
-// Book appointment
+// ---------------- Book appointment ----------------
 const bookAppointment = async (req, res) => {
   try {
     const { patientUserId, doctorUserId, start, reason } = req.body;
@@ -32,7 +31,7 @@ const bookAppointment = async (req, res) => {
       return res.status(400).json({ error: 'patientUserId, doctorUserId, and start are required' });
     }
 
-    // ensure both are valid users with correct roles
+    // validate users
     const [patUser, docUser] = await Promise.all([
       User.findById(patientUserId).select('_id role').lean(),
       User.findById(doctorUserId).select('_id role').lean(),
@@ -45,9 +44,9 @@ const bookAppointment = async (req, res) => {
     }
 
     const startDate = new Date(start);
-    const endDate   = new Date(startDate.getTime() + 60 * 60 * 1000); // 60 mins
+    const endDate   = new Date(startDate.getTime() + 60 * 60 * 1000);
 
-    // must be inside an available window
+    // check doctor availability
     const avail = await Availability.findOne({
       doctorUserId,
       isBlocked: false,
@@ -56,10 +55,10 @@ const bookAppointment = async (req, res) => {
     }).lean();
     if (!avail) return res.status(409).json({ error: 'Selected time not available' });
 
-    // Prevent overlaps, doctor
+    // prevent overlaps
     const doctorOverlap = await Appointment.findOne({
       doctorUserId,
-      status: { $in: ['BOOKED'] },
+      status: 'BOOKED',
       $or: [
         { start: { $lt: endDate, $gte: startDate } },
         { end:   { $gt: startDate, $lte: endDate } },
@@ -70,10 +69,9 @@ const bookAppointment = async (req, res) => {
       return res.status(409).json({ error: 'Doctor already booked for that time' });
     }
 
-    // Prevent overlaps, patient
     const patientOverlap = await Appointment.findOne({
       patientUserId,
-      status: { $in: ['BOOKED'] },
+      status: 'BOOKED',
       $or: [
         { start: { $lt: endDate, $gte: startDate } },
         { end:   { $gt: startDate, $lte: endDate } },
@@ -84,7 +82,7 @@ const bookAppointment = async (req, res) => {
       return res.status(409).json({ error: 'You already have an appointment overlapping that time.' });
     }
 
-    // Create appointment
+    // create
     const appt = await Appointment.create({
       patientUserId,
       doctorUserId,
@@ -94,20 +92,19 @@ const bookAppointment = async (req, res) => {
       status: 'BOOKED'
     });
 
-    // CHANGED: do NOT write Notification here.
-    // Let the event bus create notifications using User _ids.
-    bus.emit("appointment.booked", { appointment: appt.toObject() }); // NEW
+    // ✅ CHANGED: trigger notification via event bus (BOOKED)
+    bus.emit("appointment.booked", { appointment: appt.toObject() });
 
     res.status(201).json({ _id: appt._id, status: appt.status });
   } catch (e) {
-    if (e && (e.code === 11000 || (e.name === 'MongoServerError' && e.code === 11000))) {
+    if (e && e.code === 11000) {
       return res.status(409).json({ error: 'Doctor already booked for that time' });
     }
     return res.status(400).json({ error: e.message });
   }
 };
 
-// Get appointments list
+// ---------------- Get my appointments ----------------
 const getMyAppointments = async (req, res) => {
   try {
     const { patientUserId } = req.query;
@@ -137,7 +134,6 @@ const getMyAppointments = async (req, res) => {
     res.json(list.map(a => {
       const doc = a.doctorUserId;
       const prof = doc ? profByUser.get(String(doc._id)) : null;
-
       return {
         _id: a._id,
         start: a.start,
@@ -160,13 +156,13 @@ const getMyAppointments = async (req, res) => {
   }
 };
 
-// Cancel Appointment
+// ---------------- Cancel appointment ----------------
 const cancelAppointment = async (req, res) => {
   try {
     const { id } = req.params;
     const appt = await Appointment.findById(id);
-
     if (!appt) return res.status(404).json({ error: 'Appointment not found' });
+
     if (appt.status === 'CANCELLED') {
       return res.json({ _id: appt._id, status: appt.status });
     }
@@ -174,9 +170,8 @@ const cancelAppointment = async (req, res) => {
     appt.status = 'CANCELLED';
     await appt.save();
 
-    // CHANGED: do NOT write Notification here.
-    // Let the event bus create notifications using User _ids.
-    bus.emit("appointment.canceled", { appointment: appt.toObject() }); // NEW
+    // ✅ CHANGED: trigger notification via event bus (CANCELLED)
+    bus.emit("appointment.canceled", { appointment: appt.toObject() });
 
     return res.json({ _id: appt._id, status: appt.status });
   } catch (e) {
@@ -184,7 +179,7 @@ const cancelAppointment = async (req, res) => {
   }
 };
 
-// Update Appointment (Reschedule/Edit)
+// ---------------- Update appointment (reschedule/edit) ----------------
 const updateAppointment = async (req, res) => {
   try {
     const { id } = req.params;
@@ -197,10 +192,13 @@ const updateAppointment = async (req, res) => {
     }
     if (!start) return res.status(400).json({ error: 'start (ISO) is required' });
 
+    const oldStart = appt.start; // ✅ ADDED: keep old start for reschedule notification
+
     const startDate = new Date(start);
     const endDate   = new Date(startDate.getTime() + 60 * 60 * 1000);
     const doctorUserId  = appt.doctorUserId;
 
+    // check doctor availability
     const avail = await Availability.findOne({
       doctorUserId,
       isBlocked: false,
@@ -209,6 +207,7 @@ const updateAppointment = async (req, res) => {
     }).lean();
     if (!avail) return res.status(409).json({ error: 'Selected time not available' });
 
+    // overlap checks
     const overlappingDoctor = await Appointment.findOne({
       _id: { $ne: appt._id },
       doctorUserId,
@@ -242,8 +241,8 @@ const updateAppointment = async (req, res) => {
     if (reason) appt.reason = reason;
     await appt.save();
 
-    // (Optional) emit a rescheduled event if you want notifications for it later
-    // bus.emit("appointment.rescheduled", { appointment: appt.toObject() }); // OPTIONAL
+    // ✅ ADDED: emit rescheduled event (notifications for both parties)
+    bus.emit("appointment.rescheduled", { appointment: appt.toObject(), oldStart });
 
     return res.json({
       _id: appt._id,
@@ -252,9 +251,40 @@ const updateAppointment = async (req, res) => {
       end:   appt.end,
     });
   } catch (e) {
-    if (e && (e.code === 11000 || (e.name === 'MongoServerError' && e.code === 11000))) {
+    if (e && e.code === 11000) {
       return res.status(409).json({ error: 'Doctor already booked for that time' });
     }
+    return res.status(400).json({ error: e.message });
+  }
+};
+
+// ---------------- Complete appointment ----------------
+// ✅ ADDED: lets a doctor mark an appointment as COMPLETED
+//          (so it appears in the patient's History immediately)
+const completeAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const u = req.user || {};
+    const doctorUserId = u._id;
+
+    const appt = await Appointment.findById(id);
+    if (!appt) return res.status(404).json({ error: 'Appointment not found' });
+
+    if (String(appt.doctorUserId) !== String(doctorUserId)) {
+      return res.status(403).json({ error: 'Only the owning doctor can complete this appointment' });
+    }
+    if (appt.status !== 'BOOKED') {
+      return res.status(409).json({ error: 'Only BOOKED appointments can be completed' });
+    }
+
+    appt.status = 'COMPLETED';
+    await appt.save();
+
+    // (Optional) If you also want a "COMPLETED" notification:
+    // bus.emit("appointment.completed", { appointment: appt.toObject() });
+
+    res.json({ _id: appt._id, status: appt.status });
+  } catch (e) {
     return res.status(400).json({ error: e.message });
   }
 };
@@ -265,4 +295,5 @@ module.exports = {
   getMyAppointments,
   cancelAppointment,
   updateAppointment,
+  completeAppointment, // ✅ ADDED
 };

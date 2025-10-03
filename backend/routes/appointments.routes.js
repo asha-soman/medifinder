@@ -108,5 +108,7 @@ router.get('/specialties', async (req, res) => {
     res.status(400).json({ error: e.message });
   }
 });
-
+router.patch('/appointments/:id/complete', authenticate, requireRole('doctor'), (req, res) =>
+  completeAppointmentFacade(req, res)
+);
 module.exports = router;
