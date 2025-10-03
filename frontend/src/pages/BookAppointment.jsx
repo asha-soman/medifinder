@@ -1,5 +1,5 @@
 // src/pages/BookAppointment.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { bookAppointment, getMe } from "../api/bookingApi";
 import "./BookAppointment.css";
@@ -20,6 +20,11 @@ export default function BookAppointment() {
   const [reason, setReason] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  // validation state
+  const [touched, setTouched] = useState({ email: false, phone: false });
+  const [emailErr, setEmailErr] = useState("");
+  const [phoneErr, setPhoneErr] = useState("");
 
   // --- helpers: decode JWT for fallback user id ---
   const decodeJwt = (t) => {
@@ -42,6 +47,73 @@ export default function BookAppointment() {
     claims?.user?.id ||
     null;
 
+  // ---- validators ----
+  const validateEmail = (val) => {
+    const v = (val || "").trim();
+    if (!v) return "Email is required.";
+    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    return ok ? "" : "Enter a valid email (e.g., name@example.com).";
+  };
+
+  const validatePhoneAU = (val) => {
+    const raw = (val || "").trim();
+    if (!raw) return "Contact number is required.";
+    const cleaned = raw.replace(/[^\d+]/g, "");
+    const local = cleaned.startsWith("+61") ? "0" + cleaned.slice(3) : cleaned;
+    const digits = local.replace(/\D/g, "");
+    const mobileOk = /^04\d{8}$/.test(digits);
+    const landlineOk = /^0[2378]\d{8}$/.test(digits);
+    if (mobileOk || landlineOk) return "";
+    return "Enter an AU number (e.g., 0412 345 678 or (07) 3123 4567).";
+  };
+
+  // ---- phone input filtering + formatting ----
+  const filterPhoneChars = (input) => input.replace(/[^0-9+()\-\s]/g, "");
+  const normalizeToLocal = (input) => {
+    const digitsPlus = input.replace(/[^\d+]/g, "");
+    if (digitsPlus.startsWith("+61")) {
+      return "0" + digitsPlus.slice(3);
+    }
+    return digitsPlus;
+  };
+
+  const formatPhoneAU = useCallback((input) => {
+    const filtered = filterPhoneChars(input);
+    const localish = normalizeToLocal(filtered);
+    const d = localish.replace(/\D/g, "");
+
+    if (d.startsWith("04")) {
+      if (d.length <= 4) return d;
+      if (d.length <= 7) return `${d.slice(0, 4)} ${d.slice(4)}`;
+      if (d.length <= 10) return `${d.slice(0, 4)} ${d.slice(4, 7)} ${d.slice(7)}`;
+      return `${d.slice(0, 4)} ${d.slice(4, 7)} ${d.slice(7, 10)} ${d.slice(10)}`;
+    }
+
+    if (/^0[2378]/.test(d)) {
+      if (d.length <= 2) return d;
+      if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+      if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)} ${d.slice(6)}`;
+      return `(${d.slice(0, 2)}) ${d.slice(2, 6)} ${d.slice(6, 10)} ${d.slice(10)}`;
+    }
+
+    if (d.length <= 3) return d;
+    if (d.length <= 6) return `${d.slice(0, 3)} ${d.slice(3)}`;
+    if (d.length <= 10) return `${d.slice(0, 3)} ${d.slice(3, 6)} ${d.slice(6)}`;
+    return `${d.slice(0, 3)} ${d.slice(3, 6)} ${d.slice(6, 10)} ${d.slice(10)}`;
+  }, []);
+
+  // Recompute errors on value change when field already touched
+  useEffect(() => {
+    if (touched.email) setEmailErr(validateEmail(email));
+  }, [email, touched.email]);
+  useEffect(() => {
+    if (touched.phone) setPhoneErr(validatePhoneAU(contactNumber));
+  }, [contactNumber, touched.phone]);
+
+  const formValid = useMemo(() => {
+    return !validateEmail(email) && !validatePhoneAU(contactNumber);
+  }, [email, contactNumber]);
+
   // ---- hydrate user (try /me, else decode JWT) ----
   useEffect(() => {
     (async () => {
@@ -52,30 +124,27 @@ export default function BookAppointment() {
         return;
       }
       try {
-        // Preferred: authoritative profile
         const u = await getMe();
         if (u?._id) {
           setMe(u);
           if (u?.name) setPatientName((v) => v || u.name);
           if (u?.email) setEmail((v) => v || u.email);
-          if (u?.phone) setContactNumber((v) => v || u.phone);
+          if (u?.phone) setContactNumber((v) => v || formatPhoneAU(u.phone));
           return;
         }
       } catch {
-        // fall through to JWT decode
+        // ignore
       } finally {
         setMeLoading(false);
       }
 
-      // Fallback: decode token for id/role if /me failed
       const claims = decodeJwt(token);
       const pid = claimId(claims);
       if (pid) {
         setMe((m) => m || { _id: pid, role: claims?.role || claims?.roles?.[0] });
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [formatPhoneAU]);
 
   // guard: must come from Search page with a doctor + slot
   const doctorId = doctor.doctorId ?? doctor.doctorUserId ?? doctor._id ?? null;
@@ -99,34 +168,46 @@ export default function BookAppointment() {
 
   const onSubmit = async () => {
     setError("");
+    const eErr = validateEmail(email);
+    const pErr = validatePhoneAU(contactNumber);
+    setEmailErr(eErr);
+    setPhoneErr(pErr);
+    setTouched({ email: true, phone: true });
+    if (eErr || pErr) return;
+
     setSubmitting(true);
     try {
       const token = localStorage.getItem("jwt");
       if (!token) {
-        // no token at all -> must login
         navigate("/login", { state: { from: { pathname: "/patient/book" }, msg: "Please sign in to book" } });
         return;
       }
 
-      // Pull patient id from /me or JWT claims
       let patientId = me?._id;
       if (!patientId) {
         const claims = decodeJwt(token);
         patientId = claimId(claims);
       }
 
-      // Build payload: backend expects `start` (ISO) and typically infers patient from JWT
-      // but we also pass patient ids if meron
+      const digitsLocal = normalizeToLocal(contactNumber).replace(/\D/g, "");
+      const e164 = digitsLocal.startsWith("0")
+        ? `+61${digitsLocal.slice(1)}`
+        : digitsLocal.startsWith("61")
+        ? `+${digitsLocal}`
+        : `+61${digitsLocal}`;
+
       const payload = {
         doctorUserId: doctorId,
         doctorId: doctorId,
         start: slotISO,
         reason: reason?.trim() || undefined,
         ...(patientId ? { patientUserId: patientId, patientId } : {}),
+        patientName: patientName?.trim() || undefined,
+        email: email?.trim() || undefined,
+        contactNumber: e164,
       };
 
       await bookAppointment(payload);
-
       navigate("/patient/my-appointments", { replace: true });
     } catch (e) {
       setError(e?.response?.data?.error || e?.message || "Booking failed.");
@@ -135,6 +216,8 @@ export default function BookAppointment() {
     }
   };
 
+  const onBlurField = (key) => setTouched((t) => ({ ...t, [key]: true }));
+
   return (
     <div className="book-page">
       <h1 className="page-title">Book Appointment</h1>
@@ -142,7 +225,6 @@ export default function BookAppointment() {
       {/* Appointment Summary */}
       <div className="section">
         <div className="section-title">Appointment Summary</div>
-
         <div className="summary-card">
           <div className="summary-row">
             <span className="label-strong">Doctor:</span>
@@ -150,7 +232,6 @@ export default function BookAppointment() {
               &nbsp;{doctor.doctorName || doctor.name}&nbsp;–&nbsp;{doctor.specialty || doctor.specialization}
             </span>
           </div>
-
           <div className="summary-row summary-row--meta">
             <div className="meta-cell meta-left">
               <span className="label-strong">Date:</span>
@@ -168,24 +249,61 @@ export default function BookAppointment() {
         </div>
       </div>
 
-      {/* Patient Details (display-only) */}
+      {/* Patient Details */}
       <div className="section">
         <div className="section-title">Patient Details</div>
-
         <div className="form-grid">
           <div className="form-field form-span-2">
             <label className="label">Name</label>
-            <input className="input" value={patientName} onChange={(e) => setPatientName(e.target.value)} placeholder="Full name" />
+            <input
+              className="input"
+              value={patientName}
+              onChange={(e) => setPatientName(e.target.value)}
+              placeholder="Full name"
+            />
           </div>
 
           <div className="form-field">
             <label className="label">Email Address</label>
-            <input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@email.com" />
+            <input
+              className={`input ${touched.email && emailErr ? "input-error" : ""}`}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onBlur={() => onBlurField("email")}
+              aria-invalid={!!(touched.email && emailErr)}
+              aria-describedby="email-help"
+              placeholder="name@example.com"
+            />
+            {touched.email && emailErr ? (
+              <div id="email-help" className="field-error">{emailErr}</div>
+            ) : (
+              <div id="email-help" className="field-hint">Enter valid email.</div>
+            )}
           </div>
 
           <div className="form-field">
             <label className="label">Contact Number</label>
-            <input className="input" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)} placeholder="+61 ..." />
+            <input
+              className={`input ${touched.phone && phoneErr ? "input-error" : ""}`}
+              type="tel"
+              inputMode="tel"
+              pattern="^[0-9+()\-\s]+$"
+              value={contactNumber}
+              onChange={(e) => {
+                const next = formatPhoneAU(e.target.value);
+                setContactNumber(next);
+              }}
+              onBlur={() => onBlurField("phone")}
+              aria-invalid={!!(touched.phone && phoneErr)}
+              aria-describedby="phone-help"
+              placeholder="0412 345 678 or (07) 3123 4567"
+            />
+            {touched.phone && phoneErr ? (
+              <div id="phone-help" className="field-error">{phoneErr}</div>
+            ) : (
+              <div id="phone-help" className="field-hint">AU numbers only. Letters are blocked.</div>
+            )}
           </div>
         </div>
       </div>
@@ -193,7 +311,13 @@ export default function BookAppointment() {
       {/* Reason */}
       <div className="section">
         <div className="section-title">Reason For Visit</div>
-        <textarea className="textarea" rows={5} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Optional" />
+        <textarea
+          className="textarea"
+          rows={5}
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          placeholder="Optional"
+        />
       </div>
 
       {error && <div className="error-block">{error}</div>}
@@ -203,7 +327,12 @@ export default function BookAppointment() {
         <button className="btn appointment-button btn-cancel" onClick={() => navigate(-1)}>
           Cancel
         </button>
-        <button className="btn appointment-button btn-primary" onClick={onSubmit} disabled={submitting || meLoading}>
+        <button
+          className="btn appointment-button btn-primary"
+          onClick={onSubmit}
+          disabled={submitting || meLoading || !formValid}
+          title={!formValid ? "Please fix the highlighted fields" : undefined}
+        >
           {submitting ? "Booking…" : "Book"}
         </button>
       </div>
