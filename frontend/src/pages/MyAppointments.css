@@ -1,4 +1,8 @@
-.myappts-page, .myappts-page * { font-family: "Poppins", sans-serif; }
+.myappts-page, .myappts-page * { font-family: "Poppins", sans-serif;}
+
+.myappts-page{
+  height: 100%;
+}
 
 .myappts-title {
   padding-top: 60px;
