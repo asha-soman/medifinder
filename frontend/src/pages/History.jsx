@@ -59,8 +59,8 @@ export default function History() {
   }, [load]);
 
   return (
-    <div style={{ maxWidth: 960, margin: "32px auto", padding: "0 24px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+    <div style={{ maxWidth: 960, margin: "32px auto", padding: "0 24px", height: "100%" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 35 }}>
         <h2 style={{ margin: 0 }}>Appointments History</h2>
         <button type="button" style={btnGhost} onClick={load}>Refresh</button>
       </div>

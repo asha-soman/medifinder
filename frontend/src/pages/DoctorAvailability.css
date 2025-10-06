@@ -2,6 +2,7 @@
     max-width: 1200px;
     margin: 24px auto;
     padding: 0 16px;
+    height: 100%;
 }
 
 .header-title {

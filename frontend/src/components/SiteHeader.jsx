@@ -85,10 +85,6 @@ export default function SiteHeader() {
                 <i className="bi bi-calendar-event me-1" aria-hidden="true"></i>
                 Manage Schedule
               </Link>
-              <Link to="/doctor/history" className="header-link">
-                <i className="bi bi-clock-history me-1" aria-hidden="true"></i>
-                History
-              </Link>
               <Link to="/doctor/profile" className="header-link">
                 <i className="bi bi-person-circle me-1" aria-hidden="true"></i>
                 Profile

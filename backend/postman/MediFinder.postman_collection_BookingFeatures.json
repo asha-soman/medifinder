@@ -1,0 +1,238 @@
+{
+    "info": {
+        "_postman_id": "e4a7004e-9364-4c22-9b53-453538267d27",
+        "name": "MediFinder",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "_exporter_id": "48308294",
+        "_collection_link": "https://hannahfojas-4417610.postman.co/workspace/Hannah-Grace-Fojas's-Workspace~033b7a31-c1f8-480f-84f7-f78b5101a20c/collection/48308294-e4a7004e-9364-4c22-9b53-453538267d27?action=share&source=collection_link&creator=48308294"
+    },
+    "item": [
+        {
+            "name": "auth",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"email\": \"samuelfojas@gmail.com\",\n  \"password\": \"samuel123\"\n}\n",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "http://localhost:5001/api/auth/login",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "5001",
+                    "path": [
+                        "api",
+                        "auth",
+                        "login"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "searchDoctors",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRkZjAyNjNlNTQxNmQzNDg3M2ExZDQiLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTc1OTQ5Njc1NCwiZXhwIjoxNzYwMTAxNTU0fQ.ol1FJLwcFbvTVy56U4NgVzh2eQVfeFmcjeL4wjQxO7E",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "http://localhost:5001/api/booking/search?date=2025-10-30",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "5001",
+                    "path": [
+                        "api",
+                        "booking",
+                        "search"
+                    ],
+                    "query": [
+                        {
+                            "key": "date",
+                            "value": "2025-10-30"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "bookAppointment",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRkZjAyNjNlNTQxNmQzNDg3M2ExZDQiLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTc1OTQ5NzYwNiwiZXhwIjoxNzYwMTAyNDA2fQ.lDZ6uAFzjM6jrWDAScHYLPXBal31QuOJ1zSgYRwrvcA",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"doctorUserId\": \"68dc8bb7775109f138037404\",\n  \"patientUserId\": \"68ddf0263e5416d34873a1d4\",\n  \"start\": \"2025-10-30T01:00:00.000Z\",\n  \"reason\": \"Headache and dizziness\"\n}\n",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "http://localhost:5001/api/booking/book",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "5001",
+                    "path": [
+                        "api",
+                        "booking",
+                        "book"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "editAppointment",
+            "request": {
+                "method": "PATCH",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRkZjAyNjNlNTQxNmQzNDg3M2ExZDQiLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTc1OTM5ODIyNSwiZXhwIjoxNzYwMDAzMDI1fQ.uQF65XoAzTOKvjy-0l7E3xbN_BDH3MDTby095wK9MhE",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"start\": \"2025-10-30T02:00:00.000Z\",\n  \"reason\": \"Rescheduled test\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "http://localhost:5001/api/booking/appointments/68dfcda057b8e0b6e305d6d5",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "5001",
+                    "path": [
+                        "api",
+                        "booking",
+                        "appointments",
+                        "68dfcda057b8e0b6e305d6d5"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "cancelAppointment",
+            "request": {
+                "method": "PATCH",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRkZjAyNjNlNTQxNmQzNDg3M2ExZDQiLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTc1OTM5ODIyNSwiZXhwIjoxNzYwMDAzMDI1fQ.uQF65XoAzTOKvjy-0l7E3xbN_BDH3MDTby095wK9MhE",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "http://localhost:5001/api/booking/appointments/68dfcb2b57b8e0b6e305d6b1/cancel",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "5001",
+                    "path": [
+                        "api",
+                        "booking",
+                        "appointments",
+                        "68dfcb2b57b8e0b6e305d6b1",
+                        "cancel"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "getMyAppointment",
+            "protocolProfileBehavior": {
+                "disableBodyPruning": true
+            },
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGRkZjAyNjNlNTQxNmQzNDg3M2ExZDQiLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTc1OTQ5Njc1NCwiZXhwIjoxNzYwMTAxNTU0fQ.ol1FJLwcFbvTVy56U4NgVzh2eQVfeFmcjeL4wjQxO7E",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "http://localhost:5001/api/booking/my?patientUserId=68ddf0263e5416d34873a1d4",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "5001",
+                    "path": [
+                        "api",
+                        "booking",
+                        "my"
+                    ],
+                    "query": [
+                        {
+                            "key": "patientUserId",
+                            "value": "68ddf0263e5416d34873a1d4"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        }
+    ]
+}
+

@@ -208,7 +208,7 @@ export default function Notification() {
    STYLES
    ========================= */
 const styles = {
-  pageWrap: { maxWidth: 980, margin: "32px auto 0", padding: "0 24px" },
+  pageWrap: { maxWidth: 980, margin: "32px auto 0", padding: "0 24px", height: "100%" },
   headerRow: {
     display: "flex",
     alignItems: "center",
